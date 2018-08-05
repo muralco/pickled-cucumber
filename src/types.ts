@@ -28,7 +28,7 @@ export type StepDefinitionFn = (
   opts?: StepOptions,
 ) => void;
 
-export type TearDownFn = () => void;
+export type TearDownFn = () => Promise<void>|void;
 
 export interface SetupFnArgs {
   getCtx: <T>(name: string) => T;

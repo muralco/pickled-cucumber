@@ -1,39 +1,72 @@
 import * as assert from 'assert';
+import { AfterAll } from 'cucumber';
+import { promisify } from 'util';
 import compareJson from './compare-json';
-import { Entity } from './entities/types';
+import createMongoEntity from './entities/mongodb';
+import { Entity, EntityMap } from './entities/types';
 import setup, { Options, SetupFn } from './index';
 import { CompareError } from './operators/types';
 
 let initialTen = 10;
 
 // === Test `entities` ====================================================== //
+const entities: EntityMap = {};
+
 interface Box { id: number; color: string; }
 const boxes: Box[] = [];
-const boxEntity: Entity<Box> = {
+const boxEntity: Entity<Box, 'id'> = {
   create: async (r = { id: 0, color: 'random' }) => {
     const b = { ...r, id: boxes.length };
     boxes.push(b);
     return b;
   },
   delete: async (r) => {
-    const box = (await boxEntity.findBy(r))[0];
+    const box = await boxEntity.findBy(r);
+    if (!box) return;
     boxes.splice(boxes.findIndex(b => b === box), 1);
   },
-  findBy: async r => boxes.filter(b => b === r || b.id === r),
+  findBy: async r => boxes.find(b => b === r || b.id === r),
+  findById: r => boxEntity.findBy(r),
   update: async (r, u) => {
-    const box = (await boxEntity.findBy(r))[0];
-    Object.assign(box, u);
+    const box = (await boxEntity.findBy(r)) as Box;
+    return Object.assign(box, u);
   },
 };
+entities['box'] = boxEntity;
+
+// === Test `entities/mongo` ================================================ //
+if (require.resolve('mongodb')) {
+  const mongo = require('mongodb');
+  let client: any;
+  let connected = false;
+
+  const getDb = async () => {
+    if (client) return client;
+
+    client = promisify(mongo.MongoClient.connect)(
+      'mongodb://localhost:27017/test',
+    );
+
+    await client;
+    connected = true;
+    return client;
+  };
+  AfterAll(async () => {
+    if (connected) (await client).close();
+  });
+
+  entities['user'] = createMongoEntity(getDb, 'test-users', 'id', {
+    onCreate: attrs => ({ id: Date.now(), ...attrs, created: Date.now() }),
+    onUpdate: attrs => ({ ...attrs, updated: Date.now() }),
+  });
+}
 
 // ========================================================================== //
 const options: Options = {
   aliases: {
     any: /.*/,
   },
-  entities: {
-    box: boxEntity,
-  },
+  entities,
   initialContext: () => ({ initialFive: 5 }),
   requireMocks: {
     'totally-random-module': 42,
@@ -116,7 +149,7 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
     'incrementing the value of the global initialTen',
     () => {
       initialTen += 1;
-      onTearDown(() => initialTen -= 1);
+      onTearDown(() => { initialTen -= 1; });
     },
   );
   Then(

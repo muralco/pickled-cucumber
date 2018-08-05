@@ -17,7 +17,9 @@ const setup = (
         payload && JSON.parse(payload),
       );
       setCtx(varName, record);
-      onTearDown(() => entities[entity].delete(record));
+      if (!process.env.KEEP_DATA) {
+        onTearDown(() => entities[entity].delete(record));
+      }
     },
     { optional: 'with' },
   );
@@ -26,25 +28,25 @@ const setup = (
     async (entity, varName, payload) => {
       const record = getCtx(varName);
       const changes = JSON.parse(payload);
-      await entities[entity].update(record, changes);
-      setCtx(varName, (await entities[entity].findBy(record))[0]);
+      const changedRecord = await entities[entity].update(record, changes);
+      setCtx(varName, changedRecord);
     },
     { inline: true },
   );
 
   Then(
-    `the document for (${entitySpec}) {variable} {op}`,
-    async (entity, id, op, payload) => {
-      const doc = (await entities[entity].findBy(getCtx(id)))[0];
+    `the document for ${entitySpec} {variable} {op}`,
+    async (entity, varName, op, payload) => {
+      const doc = await entities[entity].findById(getCtx(varName));
       compare(op, doc, payload);
       setCtx('$last-doc', doc);
     },
     { inline: true },
   );
   Then(
-    `the document for the (${entitySpec}) with (\\{.*\\}) {op}`,
+    `the document for the ${entitySpec} with (\\{.*\\}) {op}`,
     async (entity, query, op, payload) => {
-      const doc = (await entities[entity].findBy(JSON.parse(query)))[0];
+      const doc = await entities[entity].findBy(JSON.parse(query));
       compare(op, doc, payload);
       setCtx('$last-doc', doc);
     },
@@ -56,12 +58,27 @@ const setup = (
     { inline: true },
   );
   Then(
-    `the (${entitySpec}) {variable} was deleted`,
-    async (entity, id) => assert.equal(
-      (await entities[entity].findBy(getCtx(id)))[0],
+    `the ${entitySpec} {variable} was deleted`,
+    async (entity, varName) => assert.equal(
+      await entities[entity].findById(getCtx(varName)),
       null,
     ),
   );
+  Then(
+    `store the document for the ${entitySpec} with (\\{.*\\}) in {variable}`,
+    async (entity, query, varName) => {
+      const doc = await entities[entity].findBy(JSON.parse(query));
+      setCtx(varName, doc);
+    },
+  );
+  Then(
+    `store the document for ${entitySpec} {variable} in {variable}`,
+    async (entity, varName, targetVar) => {
+      const doc = await entities[entity].findById(getCtx(varName));
+      setCtx(targetVar, doc);
+    },
+  );
+
 };
 
 export default setup;

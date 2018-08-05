@@ -15,9 +15,12 @@ export type SetupFn = (args: SetupFnArgs) => void;
 
 const getTearDown = () => getCtxItem<TearDownFn[]>('$tearDown');
 
-After(() => getTearDown().reverse().forEach(fn => fn()));
+After(() => Promise.all(getTearDown().reverse().map(fn => fn())));
 
 const setup = (fn: SetupFn, options: Options = {}) => {
+  // Force unhandleded promise rejections to fail (warning => error)
+  process.on('unhandledRejection', (up) => { throw up; });
+
   const {
     aliases = {},
     entities,
@@ -28,6 +31,7 @@ const setup = (fn: SetupFn, options: Options = {}) => {
   Before(() => {
     const customCtx = options.initialContext && options.initialContext() || {};
     setCtx({
+      random: Date.now(),
       ...customCtx,
       $tearDown: [],
     });

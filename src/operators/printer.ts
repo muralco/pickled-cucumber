@@ -23,8 +23,30 @@ export default (ops: OperatorMap) => {
     .join('');
 };
 
+const prettyJson = (o: any) => JSON.stringify(o, undefined, 2);
+
 export const printError = (error: CompareError) => {
-  assert.fail(
-    `${JSON.stringify(error.actual)} ${error.error} ${error.expected}`,
+  const path = error.subError ? error.subError.path : error.path;
+  const at = path
+    ? ` (at ${path})`
+    : '';
+
+  assert.fail(`
+  Error${at}:
+    ${prettyJson(error.actual)} ${error.error} ${error.expected}
+  \n\n
+  Actual${at}:
+    ${prettyJson(error.subError && error.subError.actual || error.actual)}
+  Expected:
+    ${prettyJson(error.expected)}
+
+  ${error.full
+    ? `
+  Full actual object:
+    ${prettyJson(error.full)}
+  `
+    : ''
+  }
+  `,
   );
 };

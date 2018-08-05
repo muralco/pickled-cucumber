@@ -15,6 +15,7 @@
   "scripts": {
     "build": "npm run lint && tsc",
     "lint": "tslint -p . && ts-unused-exports tsconfig.json",
+    "setup": "npm i  && npm i --no-save mongodb@2.2.27",
     "test": "cucumber-js --require-module ts-node/register --tags 'not @ignore' -r src/test.ts",
     "watch": "tsc -w"
   }

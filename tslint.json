@@ -1,0 +1,39 @@
+{
+  "extends": ["tslint-config-airbnb"],
+  "rules": {
+    "arrow-return-shorthand": true,
+    "import-name": false,
+    "max-line-length": [true, 80],
+    "member-ordering": [
+      true,
+      {
+        "order": [
+          "static-field",
+          "instance-field",
+          "constructor",
+          "public-instance-method",
+          "protected-instance-method",
+          "private-instance-method"
+        ]
+      }
+    ],
+    "no-invalid-this": true,
+    "no-trailing-whitespace": true,
+    "object-literal-sort-keys": [true, "ignore-case"],
+    "object-shorthand-properties-first": false,
+    "one-line": [true, "check-open-brace"],
+    "ordered-imports": true,
+    "variable-name": [true, "ban-keywords", "check-format", "allow-pascal-case"],
+    "whitespace": [
+      true,
+      "check-branch",
+      "check-decl",
+      "check-operator",
+      "check-module",
+      "check-separator",
+      "check-type",
+      "check-typecast",
+      "check-preblock"
+    ]
+  }
+}

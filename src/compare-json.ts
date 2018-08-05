@@ -1,5 +1,5 @@
 import DEFAULT_OPS, { opAtSpec } from './operators';
-import { CompareError, OperatorMap } from './operators/types';
+import { CompareResult, OperatorMap } from './operators/types';
 import { getDeep } from './util';
 
 const atRegExp = new RegExp(`^at (${opAtSpec}) (.*)$`);
@@ -9,7 +9,7 @@ function compareJson(
   opName: string,
   actual: any,
   expected: string,
-): CompareError | undefined {
+): CompareResult {
 
   const [atPath, atOp] = (atRegExp.exec(opName) || []).slice(1);
 

@@ -2,7 +2,7 @@ import { Context } from './types';
 
 let ctx: Context = {};
 
-export const resetCtx = () => ctx = {};
+export const setCtx = (c: Context) => ctx = c;
 
 export const getCtx = () => ctx;
 

@@ -1,29 +1,37 @@
-import { Before, Given, Then, When } from 'cucumber';
-import { getCtx, getCtxItem, resetCtx, setCtxItem } from './context';
-import printOperators from './operators/printer';
+import { After, Before, Given, Then, When } from 'cucumber';
+import compareJson from './compare-json';
+import { getCtx, getCtxItem, setCtx, setCtxItem } from './context';
+import setupEntities from './entities';
+import printOperators, { printError } from './operators/printer';
+import setupRequireMock from './require';
 import stepCtor from './steps/constructor';
 import printSteps from './steps/printer';
-import { Step, StepFn, StepKind, StepOptions } from './steps/types';
-import { Options } from './types';
+import { Step, StepKind } from './steps/types';
+import { Options, SetupFnArgs, StepDefinitionFn, TearDownFn } from './types';
 
 export type Options = Options;
 
-type StepDefinitionFn = (name: string, fn: StepFn, opts?: StepOptions) => void;
-
-interface SetupFnArgs {
-  getCtx: typeof getCtxItem;
-  Given: StepDefinitionFn;
-  setCtx: typeof setCtxItem;
-  Then: StepDefinitionFn;
-  When: StepDefinitionFn;
-}
-
 export type SetupFn = (args: SetupFnArgs) => void;
 
-Before(resetCtx);
+const getTearDown = () => getCtxItem<TearDownFn[]>('$tearDown');
+
+After(() => getTearDown().reverse().forEach(fn => fn()));
 
 const setup = (fn: SetupFn, options: Options = {}) => {
-  const { operators = {}, aliases = {} } = options;
+  const {
+    aliases = {},
+    entities,
+    operators = {},
+    requireMocks,
+  } = options;
+
+  Before(() => {
+    const customCtx = options.initialContext && options.initialContext() || {};
+    setCtx({
+      ...customCtx,
+      $tearDown: [],
+    });
+  });
 
   const createStep = stepCtor(operators, aliases, getCtx);
 
@@ -40,13 +48,23 @@ const setup = (fn: SetupFn, options: Options = {}) => {
     { inline: true },
   );
 
-  fn({
+  const args: SetupFnArgs = {
+    compare: (op, a, e) => {
+      const error = compareJson(operators, op, a, e);
+      if (error !== undefined) printError(error);
+    },
     getCtx: getCtxItem,
     Given: step('Given'),
+    onTearDown: fn => getTearDown().push(fn),
     setCtx: setCtxItem,
     Then: step('Then'),
     When: step('When'),
-  });
+  };
+
+  if (requireMocks) setupRequireMock(requireMocks);
+  if (entities) setupEntities(entities, args);
+
+  fn(args);
 
   console.log('Step reference');
   console.log('--------------');

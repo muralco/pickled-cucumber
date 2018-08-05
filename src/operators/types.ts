@@ -14,6 +14,8 @@ export interface CompareError extends OperatorError {
   op: string;
 }
 
+export type CompareResult = CompareError | undefined;
+
 export interface Operator {
   arity: 'binary' | 'unary';
   description: string;

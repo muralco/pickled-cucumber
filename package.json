@@ -1,4 +1,18 @@
 {
+  "name": "mural-test",
+  "version": "1.0.0",
+  "description": "MURAL testing tools",
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tactivos/mural-test.git"
+  },
+  "author": "MURAL",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tactivos/mural-test/issues"
+  },
+  "homepage": "https://github.com/tactivos/mural-test",
   "devDependencies": {
     "@types/cucumber": "^4.0.4",
     "@types/node": "^10.5.2",

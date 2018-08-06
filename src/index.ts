@@ -26,6 +26,7 @@ const setup = (fn: SetupFn, options: Options = {}) => {
     entities,
     operators = {},
     requireMocks,
+    verbose,
   } = options;
 
   Before(() => {
@@ -70,13 +71,15 @@ const setup = (fn: SetupFn, options: Options = {}) => {
 
   fn(args);
 
-  console.log('Step reference');
-  console.log('--------------');
-  console.log(printSteps(steps));
-  console.log();
-  console.log('Operators');
-  console.log('---------');
-  console.log(printOperators(operators));
+  if (verbose) {
+    console.log('Step reference');
+    console.log('--------------');
+    console.log(printSteps(steps));
+    console.log();
+    console.log('Operators');
+    console.log('---------');
+    console.log(printOperators(operators));
+  }
 
   steps.forEach((s) => {
     switch (s.kind) {

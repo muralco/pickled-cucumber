@@ -20,6 +20,7 @@ export interface Options {
   initialContext?: () => Context;
   operators?: OperatorMap;
   requireMocks?: RequireMockMap;
+  verbose?: boolean;
 }
 
 export type StepDefinitionFn = (

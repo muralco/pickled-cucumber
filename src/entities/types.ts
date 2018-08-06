@@ -1,9 +1,9 @@
-export interface Entity<T, TId extends keyof T> {
+export interface Entity<T, Tid extends keyof T> {
   create: (attrs?: T) => Promise<T>;
-  delete: (idOrObject: T|T[TId]) => Promise<void>;
-  findBy: (criteria: any) => Promise<T|undefined|null>;
-  findById: (idOrObject: T|T[TId]) => Promise<T|undefined|null>;
-  update: (idOrObject: T|T[TId], attrs: Partial<T>) => Promise<T>;
+  delete: (idOrObject: T|T[Tid]) => Promise<void>;
+  findBy: (criteria: object) => Promise<T|undefined|null>;
+  findById: (idOrObject: T|T[Tid]) => Promise<T|undefined|null>;
+  update: (idOrObject: T|T[Tid], attrs: Partial<T>) => Promise<T>;
 }
 
 export interface EntityMap {

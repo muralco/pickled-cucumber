@@ -21,14 +21,16 @@ const boxEntity: Entity<Box, 'id'> = {
     return b;
   },
   delete: async (r) => {
-    const box = await boxEntity.findBy(r);
+    const box = await boxEntity.findById(r);
     if (!box) return;
     boxes.splice(boxes.findIndex(b => b === box), 1);
   },
-  findBy: async r => boxes.find(b => b === r || b.id === r),
-  findById: r => boxEntity.findBy(r),
+  findBy: async r =>
+    boxes.find(b => b === r || b.id === (r as Box).id),
+  findById: r =>
+    boxEntity.findBy({ id: typeof r === 'number' ? r : r && r.id }),
   update: async (r, u) => {
-    const box = (await boxEntity.findBy(r)) as Box;
+    const box = (await boxEntity.findById(r)) as Box;
     return Object.assign(box, u);
   },
 };
@@ -71,6 +73,7 @@ const options: Options = {
   requireMocks: {
     'totally-random-module': 42,
   },
+  verbose: true,
 };
 
 const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {

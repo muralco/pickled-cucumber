@@ -2,7 +2,8 @@
   "name": "mural-test",
   "version": "1.0.0",
   "description": "MURAL testing tools",
-  "main": "dist/index.js",
+  "main": "index.js",
+  "types": "index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/tactivos/mural-test.git"
@@ -28,7 +29,9 @@
   },
   "scripts": {
     "build": "npm run lint && tsc",
+    "dist": "rm -rf dist && tsc && npm run lint && npm run test && cp package.json README.md LICENSE dist",
     "lint": "tslint -p . && ts-unused-exports tsconfig.json",
+    "pack": "npm run dist && cd dist && npm pack",
     "setup": "npm i  && npm i --no-save mongodb@2.2.27",
     "test": "cucumber-js --require-module ts-node/register --tags 'not @ignore' -r src/test.ts",
     "watch": "tsc -w"

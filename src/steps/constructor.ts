@@ -1,6 +1,4 @@
 import BUILT_IN_ALIASES from '../aliases';
-import { getOpSpec } from '../operators';
-import { OperatorMap } from '../operators/types';
 import { Aliases, Context } from '../types';
 import { getDeep } from '../util';
 import { Step, StepFn, StepKind, StepOptions } from './types';
@@ -15,7 +13,6 @@ const expand = (ctx: Context) => (str: string) =>
 
 // Resolve shorthand expressions into actual regexps
 const resolveRegExp = (
-  ops: OperatorMap,
   aliases: Aliases,
   regexpString: string,
 ) =>
@@ -25,7 +22,7 @@ const resolveRegExp = (
       `(${aliases[k].source})`,
     ),
     regexpString,
-  ).replace(/\{op\}/, `(${getOpSpec(ops)})`);
+  );
 
 // Creates a proxy of fn that calls `expand` on every argument
 const proxyFnFor = (
@@ -62,7 +59,6 @@ const proxyFnFor = (
 //   `optional` is a string, that string is appended to all other version of
 //    this step. Note that setting `optional` implies `inline`
 export default (
-  ops: OperatorMap,
   aliases: Aliases,
   getCtx: () => Context,
 ) => (
@@ -76,7 +72,7 @@ export default (
 
   const allAliases = { ...BUILT_IN_ALIASES, ...aliases };
 
-  const rawRegExp = resolveRegExp(ops, allAliases, regexpString);
+  const rawRegExp = resolveRegExp(allAliases, regexpString);
   const suffix = opt.optional && opt.optional !== true
     ? ` ${opt.optional}`
     : '';

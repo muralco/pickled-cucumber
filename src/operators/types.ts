@@ -10,6 +10,7 @@ interface OperatorError {
 
 export interface CompareError extends OperatorError {
   actual: any;
+  assertEquals?: boolean;
   full?: any;
   op: string;
 }

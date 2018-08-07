@@ -23,30 +23,56 @@ export default (ops: OperatorMap) => {
     .join('');
 };
 
-const prettyJson = (o: any) => JSON.stringify(o, undefined, 2);
+const prettyJson = (o: any, p: string = '') =>
+  `${JSON.stringify(o, undefined, 2)}`.replace(/\n/g, `\n${p}`);
 
-export const printError = (error: CompareError) => {
-  const path = error.subError ? error.subError.path : error.path;
-  const at = path
-    ? ` (at ${path})`
+const assertValue = (v: any) => v === undefined
+  ? 'undefined'
+  : JSON.stringify(v);
+
+export const printError = ({
+  actual,
+  assertEquals,
+  error,
+  expected,
+  full,
+  path,
+  subError,
+}: CompareError) => {
+  const errorPath = subError ? subError.path : path;
+  const at = errorPath
+    ? ` (at ${errorPath})`
     : '';
 
-  assert.fail(`
+  const actualValue = subError && subError.actual || actual;
+
+  const padd = '    ';
+
+  const message = `
   Error${at}:
-    ${prettyJson(error.actual)} ${error.error} ${error.expected}
+    ${JSON.stringify(actual)} ${error} ${expected}
   \n\n
   Actual${at}:
-    ${prettyJson(error.subError && error.subError.actual || error.actual)}
+    ${prettyJson(actualValue, padd)}
   Expected:
-    ${prettyJson(error.expected)}
+    ${prettyJson(expected, padd)}
 
-  ${error.full
+  ${full
     ? `
   Full actual object:
-    ${prettyJson(error.full)}
+    ${prettyJson(full, padd)}
   `
     : ''
   }
-  `,
-  );
+  `;
+
+  if (assertEquals) {
+    assert.equal(
+      assertValue(actualValue),
+      assertValue(expected),
+      message,
+    );
+  } else {
+    assert.fail(message);
+  }
 };

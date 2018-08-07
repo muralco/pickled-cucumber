@@ -49,6 +49,7 @@ const op: Operator = {
       : offending.actual;
 
     return {
+      assertEquals: true,
       error: 'does not include',
       expected: expectedJson,
       subError: offending.path

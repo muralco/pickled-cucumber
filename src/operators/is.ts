@@ -14,7 +14,12 @@ const op: Operator = {
     const errorPath = recursiveMatch(actual, expectedJson);
     return errorPath === undefined
       ? undefined
-      : { error: 'is not', expected: expectedJson, path: errorPath };
+      : {
+        assertEquals: true,
+        error: 'is not',
+        expected: expectedJson,
+        path: errorPath,
+      };
   },
   name: 'is',
 };

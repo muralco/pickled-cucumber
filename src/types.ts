@@ -20,7 +20,7 @@ export interface Options {
   initialContext?: () => Context;
   operators?: OperatorMap;
   requireMocks?: RequireMockMap;
-  verbose?: boolean;
+  usage?: boolean;
 }
 
 export type StepDefinitionFn = (
@@ -32,6 +32,8 @@ export type StepDefinitionFn = (
 export type TearDownFn = () => Promise<void>|void;
 
 export interface SetupFnArgs {
+  AfterAll: (fn: TearDownFn) => void;
+  BeforeAll: (fn: TearDownFn) => void;
   getCtx: <T>(name: string) => T;
   compare: (op: string, actual: any, expected: any) => void;
   Given: StepDefinitionFn;

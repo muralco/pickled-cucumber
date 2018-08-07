@@ -18,9 +18,15 @@ interface MongoClient {
   }>;
 }
 
-interface MongoEntityOptions<T> {
-  onCreate?: (attrs?: Partial<T>) => T|Promise<T>;
-  onUpdate?: (attrs?: Partial<T>) => Partial<T>|Promise<Partial<T>>;
+interface MongoEntityOptions<T, Tid extends keyof T> {
+  onCreate?: (
+    attrs: Partial<T> | undefined,
+  ) => T|Promise<T>;
+  onUpdate?: (
+    attrs: Partial<T> | undefined,
+    id: T[Tid],
+    entity: Entity<T, Tid>,
+  ) => Partial<T>|Promise<Partial<T>>;
 }
 
 const isId = <T extends {}, Tid extends keyof T>(
@@ -28,17 +34,17 @@ const isId = <T extends {}, Tid extends keyof T>(
 ): idOrObject is T[Tid] => typeof idOrObject !== 'object';
 
 const getId = <T extends {}, Tid extends keyof T>(
-  id: Tid,
-  o: T|T[Tid],
-): T[Tid] => isId<T, Tid>(o)
-  ? o
-  : o[id];
+  idProperty: Tid,
+  idOrObject: T|T[Tid],
+): T[Tid] => isId<T, Tid>(idOrObject)
+  ? idOrObject
+  : idOrObject[idProperty];
 
 const create = <T, Tid extends keyof T>(
   getDb: () => Promise<MongoClient>,
   collectionName: string,
-  id: Tid,
-  opts: MongoEntityOptions<T> = {},
+  idProperty: Tid,
+  opts: MongoEntityOptions<T, Tid> = {},
 ): Entity<T, Tid> => {
   const entity: Entity<T, Tid> = {
     create: async (attrs) => {
@@ -53,7 +59,9 @@ const create = <T, Tid extends keyof T>(
     delete: async (idOrObject) => {
       const db = await getDb();
       const collection = await db.collection<T, Tid>(collectionName);
-      return collection.deleteOne({ [id]: getId<T, Tid>(id, idOrObject) });
+      return collection.deleteOne({
+        [idProperty]: getId<T, Tid>(idProperty, idOrObject),
+      });
     },
     findBy: async (criteria) => {
       if (!criteria) {
@@ -63,15 +71,18 @@ const create = <T, Tid extends keyof T>(
       const collection = await db.collection<T, Tid>(collectionName);
       return collection.findOne(criteria);
     },
-    findById: idOrObject => entity.findBy({ [id]: getId(id, idOrObject) }),
+    findById: idOrObject => entity.findBy({
+      [idProperty]: getId(idProperty, idOrObject),
+    }),
     update: async (idOrObject, attrs) => {
       const db = await getDb();
       const collection = await db.collection(collectionName);
+      const id = getId(idProperty, idOrObject);
       const record = opts.onUpdate
-        ? await opts.onUpdate(attrs)
+        ? await opts.onUpdate(attrs, id, entity)
         : attrs;
 
-      const criteria = { [id]: getId(id, idOrObject) };
+      const criteria = { [idProperty]: id };
 
       await collection.updateOne(criteria, { $set: record });
 

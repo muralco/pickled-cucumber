@@ -28,9 +28,9 @@ export default OPERATORS;
 
 export const opAtSpec = '[\\w.\\[\\]\\$\\{\\}-]+';
 
-export const getOpSpec = (ops: OperatorMap = {}) => {
+export const getOpSpec = (ops: OperatorMap = {}): RegExp => {
   const keys = Object.keys({ ...ops, ...OPERATORS })
     .sort()
     .join('|');
-  return `${keys}|at ${opAtSpec} (?:${keys})`;
+  return new RegExp(`${keys}|at ${opAtSpec} (?:${keys})`);
 };

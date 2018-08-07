@@ -1,13 +1,31 @@
-import { After, Before, Given, Then, When } from 'cucumber';
+import {
+  After,
+  AfterAll,
+  Before,
+  BeforeAll,
+  Given,
+  Then,
+  When,
+} from 'cucumber';
+import printAliases from './aliases/printer';
 import compareJson from './compare-json';
 import { getCtx, getCtxItem, setCtx, setCtxItem } from './context';
 import setupEntities from './entities';
+import { getOpSpec } from './operators';
 import printOperators, { printError } from './operators/printer';
 import setupRequireMock from './require';
 import stepCtor from './steps/constructor';
 import printSteps from './steps/printer';
 import { Step, StepKind } from './steps/types';
-import { Options, SetupFnArgs, StepDefinitionFn, TearDownFn } from './types';
+import {
+  Aliases,
+  Options,
+  SetupFnArgs,
+  StepDefinitionFn,
+  TearDownFn,
+} from './types';
+
+export { getVariables } from './aliases';
 
 export type Options = Options;
 
@@ -23,10 +41,10 @@ const setup = (fn: SetupFn, options: Options = {}) => {
 
   const {
     aliases = {},
-    entities,
+    entities = {},
     operators = {},
     requireMocks,
-    verbose,
+    usage,
   } = options;
 
   Before(() => {
@@ -38,7 +56,18 @@ const setup = (fn: SetupFn, options: Options = {}) => {
     });
   });
 
-  const createStep = stepCtor(operators, aliases, getCtx);
+  const entityNames = Object.keys(entities);
+  const hasEntities = !!entityNames.length;
+
+  const effectiveAliases: Aliases = {
+    ...aliases,
+    op: getOpSpec(operators),
+  };
+  if (hasEntities) {
+    effectiveAliases['entity'] = new RegExp(entityNames.join('|'));
+  }
+
+  const createStep = stepCtor(effectiveAliases, getCtx);
 
   const steps: Step[] = [];
 
@@ -54,6 +83,8 @@ const setup = (fn: SetupFn, options: Options = {}) => {
   );
 
   const args: SetupFnArgs = {
+    AfterAll,
+    BeforeAll,
     compare: (op, a, e) => {
       const error = compareJson(operators, op, a, e);
       if (error !== undefined) printError(error);
@@ -67,11 +98,11 @@ const setup = (fn: SetupFn, options: Options = {}) => {
   };
 
   if (requireMocks) setupRequireMock(requireMocks);
-  if (entities) setupEntities(entities, args);
+  if (hasEntities) setupEntities(entities, args);
 
   fn(args);
 
-  if (verbose) {
+  if (usage) {
     console.log('Step reference');
     console.log('--------------');
     console.log(printSteps(steps));
@@ -79,6 +110,10 @@ const setup = (fn: SetupFn, options: Options = {}) => {
     console.log('Operators');
     console.log('---------');
     console.log(printOperators(operators));
+    console.log();
+    console.log('Aliases');
+    console.log('-------');
+    console.log(printAliases(effectiveAliases));
   }
 
   steps.forEach((s) => {

@@ -4,7 +4,7 @@ import { promisify } from 'util';
 import compareJson from './compare-json';
 import createMongoEntity from './entities/mongodb';
 import { Entity, EntityMap } from './entities/types';
-import setup, { Options, SetupFn } from './index';
+import setup, { getVariables, Options, SetupFn } from './index';
 import { CompareError } from './operators/types';
 
 let initialTen = 10;
@@ -73,7 +73,7 @@ const options: Options = {
   requireMocks: {
     'totally-random-module': 42,
   },
-  verbose: true,
+  usage: true,
 };
 
 const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
@@ -162,3 +162,9 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
 };
 
 setup(fn, options);
+
+// === Test `getVariables` ================================================== //
+assert.deepEqual(getVariables('A'), ['A']);
+assert.deepEqual(getVariables('A, B'), ['A', 'B']);
+assert.deepEqual(getVariables('A and B'), ['A', 'B']);
+assert.deepEqual(getVariables('A, B and C'), ['A', 'B', 'C']);

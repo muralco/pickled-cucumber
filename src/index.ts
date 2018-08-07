@@ -11,6 +11,7 @@ import printAliases from './aliases/printer';
 import compareJson from './compare-json';
 import { getCtx, getCtxItem, setCtx, setCtxItem } from './context';
 import setupEntities from './entities';
+import { defineElasticSteps } from './entities/elasticsearch';
 import { getOpSpec } from './operators';
 import printOperators, { printError } from './operators/printer';
 import setupRequireMock from './require';
@@ -41,6 +42,7 @@ const setup = (fn: SetupFn, options: Options = {}) => {
 
   const {
     aliases = {},
+    elasticSearchIndexUri,
     entities = {},
     operators = {},
     requireMocks,
@@ -99,6 +101,7 @@ const setup = (fn: SetupFn, options: Options = {}) => {
 
   if (requireMocks) setupRequireMock(requireMocks);
   if (hasEntities) setupEntities(entities, args);
+  if (elasticSearchIndexUri) defineElasticSteps(elasticSearchIndexUri, args);
 
   fn(args);
 

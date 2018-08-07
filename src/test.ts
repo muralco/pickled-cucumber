@@ -2,12 +2,14 @@ import * as assert from 'assert';
 import { AfterAll } from 'cucumber';
 import { promisify } from 'util';
 import compareJson from './compare-json';
+import createElasticEntity from './entities/elasticsearch';
 import createMongoEntity from './entities/mongodb';
 import { Entity, EntityMap } from './entities/types';
 import setup, { getVariables, Options, SetupFn } from './index';
 import { CompareError } from './operators/types';
 
 let initialTen = 10;
+const ELASTIC_URI = 'http://localhost:9200/test-index';
 
 // === Test `entities` ====================================================== //
 const entities: EntityMap = {};
@@ -63,11 +65,24 @@ if (require.resolve('mongodb')) {
   });
 }
 
+// === Test `entities/elasticsearch` ======================================== //
+if (ELASTIC_URI) {
+  entities['search'] = createElasticEntity(
+    ELASTIC_URI,
+    '/test-type',
+    '_id', {
+      onCreate: attrs => ({ id: Date.now(), ...attrs, created: Date.now() }),
+      onUpdate: attrs => ({ ...attrs, updated: Date.now() }),
+    },
+  );
+}
+
 // ========================================================================== //
 const options: Options = {
   aliases: {
     any: /.*/,
   },
+  elasticSearchIndexUri: ELASTIC_URI,
   entities,
   initialContext: () => ({ initialFive: 5 }),
   requireMocks: {

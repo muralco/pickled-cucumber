@@ -1,4 +1,5 @@
-import { Entity } from './types';
+import { Entity, EntityOptions } from './types';
+import { getId } from './util';
 
 type Criteria<T, Tid extends keyof T> =
   | { [id: string]: T[Tid] }
@@ -18,33 +19,11 @@ interface MongoClient {
   }>;
 }
 
-interface MongoEntityOptions<T, Tid extends keyof T> {
-  onCreate?: (
-    attrs: Partial<T> | undefined,
-  ) => T|Promise<T>;
-  onUpdate?: (
-    attrs: Partial<T> | undefined,
-    id: T[Tid],
-    entity: Entity<T, Tid>,
-  ) => Partial<T>|Promise<Partial<T>>;
-}
-
-const isId = <T extends {}, Tid extends keyof T>(
-  idOrObject: T|T[Tid],
-): idOrObject is T[Tid] => typeof idOrObject !== 'object';
-
-const getId = <T extends {}, Tid extends keyof T>(
-  idProperty: Tid,
-  idOrObject: T|T[Tid],
-): T[Tid] => isId<T, Tid>(idOrObject)
-  ? idOrObject
-  : idOrObject[idProperty];
-
 const create = <T, Tid extends keyof T>(
   getDb: () => Promise<MongoClient>,
   collectionName: string,
   idProperty: Tid,
-  opts: MongoEntityOptions<T, Tid> = {},
+  opts: EntityOptions<T, Tid> = {},
 ): Entity<T, Tid> => {
   const entity: Entity<T, Tid> = {
     create: async (attrs) => {

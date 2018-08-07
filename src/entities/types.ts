@@ -9,3 +9,14 @@ export interface Entity<T, Tid extends keyof T> {
 export interface EntityMap {
   [name: string]: Entity<any, string|number>;
 }
+
+export interface EntityOptions<T, Tid extends keyof T> {
+  onCreate?: (
+    attrs: Partial<T> | undefined,
+  ) => T|Promise<T>;
+  onUpdate?: (
+    attrs: Partial<T> | undefined,
+    id: T[Tid],
+    entity: Entity<T, Tid>,
+  ) => Partial<T>|Promise<Partial<T>>;
+}

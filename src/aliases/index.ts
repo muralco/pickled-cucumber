@@ -1,6 +1,7 @@
 import { Aliases } from '../types';
 
 const aliases: Aliases = {
+  any: /.*/,
   boolean: /true|false/,
   int: /\d+/,
   variable: /\w+/,

@@ -80,7 +80,7 @@ if (ELASTIC_URI) {
 // ========================================================================== //
 const options: Options = {
   aliases: {
-    any: /.*/,
+    'proper-name': /[A-Z][a-z]*/,
   },
   elasticSearchIndexUri: ELASTIC_URI,
   entities,
@@ -150,6 +150,10 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
         assert.deepEqual(r.subError.path, JSON.parse(path));
       }
     },
+  );
+  Then(
+    'A proper name can be {proper-name}',
+    name => assert(!!name.match(/^[A-Z]/)),
   );
 
   // === Test `initialContext` ============================================== //

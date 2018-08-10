@@ -1,19 +1,19 @@
 {
-  "name": "mural-test",
+  "name": "pickled-cucumber",
   "version": "1.0.0",
-  "description": "MURAL testing tools",
+  "description": "Cucumber test runner with several condiments",
   "main": "index.js",
   "types": "index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tactivos/mural-test.git"
+    "url": "https://github.com/muralco/pickled-cucumber.git"
   },
   "author": "MURAL",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tactivos/mural-test/issues"
+    "url": "https://github.com/muralco/pickled-cucumber/issues"
   },
-  "homepage": "https://github.com/tactivos/mural-test",
+  "homepage": "https://github.com/muralco/pickled-cucumber",
   "devDependencies": {
     "@types/cucumber": "^4.0.4",
     "@types/node": "^10.5.2",

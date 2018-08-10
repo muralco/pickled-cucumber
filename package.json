@@ -35,7 +35,7 @@
     "lint": "tslint -p . && ts-unused-exports tsconfig.json",
     "pack": "npm run dist && cd dist && npm pack",
     "setup": "npm i  && npm i --no-save mongodb@2.2.27",
-    "test": "cucumber-js --require-module ts-node/register --tags 'not @ignore' -r src/test.ts",
+    "test": "./scripts/test.sh",
     "watch": "tsc -w"
   }
 }

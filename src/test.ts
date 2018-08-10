@@ -9,7 +9,9 @@ import setup, { getVariables, Options, SetupFn } from './index';
 import { CompareError } from './operators/types';
 
 let initialTen = 10;
-const ELASTIC_URI = 'http://localhost:9200/test-index';
+const ELASTIC_URI = process.env.ELASTIC_URI
+  ? `${process.env.ELASTIC_URI}/test-index`
+  : undefined;
 
 // === Test `entities` ====================================================== //
 const entities: EntityMap = {};
@@ -39,7 +41,7 @@ const boxEntity: Entity<Box, 'id'> = {
 entities['box'] = boxEntity;
 
 // === Test `entities/mongo` ================================================ //
-if (require.resolve('mongodb')) {
+if (process.env.MONGODB) {
   const mongo = require('mongodb');
   let client: any;
   let connected = false;

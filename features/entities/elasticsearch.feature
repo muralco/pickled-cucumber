@@ -1,3 +1,4 @@
+@elasticsearch
 Feature: Elasticsearch entities
 
 Scenario: create and assert

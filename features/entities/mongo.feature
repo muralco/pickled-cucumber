@@ -1,3 +1,4 @@
+@mongodb
 Feature: MongoDB entities
 
 Scenario: create and assert

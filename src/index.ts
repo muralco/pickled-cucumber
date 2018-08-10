@@ -38,7 +38,7 @@ After(() => Promise.all(getTearDown().reverse().map(fn => fn())));
 
 const setup = (fn: SetupFn, options: Options = {}) => {
   // Force unhandleded promise rejections to fail (warning => error)
-  process.on('unhandledRejection', (up) => { throw up; });
+  process.on('unhandledRejection', (up: any) => { throw up; });
 
   const {
     aliases = {},

@@ -1,4 +1,4 @@
 declare module 'is-deep-subset' {
-  const  isDeepSubset: (a: any, b: any) => boolean;
+  const isDeepSubset: (a: any, b: any) => boolean;
   export = isDeepSubset;
 }

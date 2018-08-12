@@ -72,7 +72,7 @@ if (ELASTIC_URI) {
   entities['search'] = createElasticEntity(
     ELASTIC_URI,
     '/test-type',
-    '_id', {
+    'id', {
       onCreate: attrs => ({ id: Date.now(), ...attrs, created: Date.now() }),
       onUpdate: attrs => ({ ...attrs, updated: Date.now() }),
     },
@@ -143,12 +143,13 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
     { inline: true },
   );
   Then(
-    'the sub error is {any} at {any}',
-    (expected, path) => {
+    'the sub error is: got {any} instead of {any} at {any}',
+    (actual, expected, path) => {
       const r = getResult();
       assert(r.subError, 'no subError found');
       if (r.subError) {
-        assert.deepEqual(r.subError.actual, JSON.parse(expected));
+        assert.deepEqual(r.subError.actual, JSON.parse(actual));
+        assert.deepEqual(r.subError.expected, JSON.parse(expected));
         assert.deepEqual(r.subError.path, JSON.parse(path));
       }
     },

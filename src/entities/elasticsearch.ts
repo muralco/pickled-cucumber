@@ -1,14 +1,15 @@
 import fetch from 'node-fetch';
 import { SetupFnArgs } from '../types';
-import { Entity, EntityOptions } from './types';
+import { Entity, EntityOptions, IdOrObject } from './types';
 import { getId } from './util';
 
 interface Doc<T> {
-  _index: string;
-  _type: string;
   _id: string;
-  _version: number;
+  _index: string;
+  _routing?: string;
   _source: T;
+  _type: string;
+  _version: number;
 }
 
 interface QueryResults<T> {
@@ -17,11 +18,15 @@ interface QueryResults<T> {
   };
 }
 
+interface Options<T, Tid extends keyof T> extends EntityOptions<T, Tid> {
+  getRouting?: (record: T) => string | undefined;
+  verbose?: true;
+}
+
 const request = async <T>(
   method: 'DELETE'|'GET'|'POST'|'PUT',
   path: string,
   body?: any,
-  bulletproof = false,
 ): Promise<T> => {
   const res = await fetch(path, {
     body: body !== undefined ? JSON.stringify(body) : undefined,
@@ -29,8 +34,14 @@ const request = async <T>(
     method,
   });
 
-  if (!bulletproof && !res.ok) {
-    throw { status: res.status, error: await res.text() };
+  if (!res.ok) {
+    throw {
+      body,
+      error: await res.text(),
+      method,
+      path,
+      status: res.status,
+    };
   }
 
   return await res.json();
@@ -40,43 +51,54 @@ const create = <T, Tid extends keyof T>(
   indexUri: string,
   indexSuffix: string,
   idProperty: Tid,
-  opts: EntityOptions<T, Tid> = {},
+  opts: Options<T, Tid> = {},
 ): Entity<T, Tid> => {
+
+  const search = async (criteria: object) => {
+    await request('POST', `${indexUri}/_flush`);
+    const docs = await request<QueryResults<T>>(
+      'POST',
+      `${indexUri}/_search`,
+      criteria,
+    );
+    return docs.hits.hits[0];
+  };
+  const getSource = (doc: Doc<T> | undefined) => doc && doc._source;
+  const getById = (idOrObject: T|T[Tid]) =>
+    search({ query: { term: { _id: `${getId(idProperty, idOrObject)}` } } });
+
+  const getRecordUri = (
+    routing: string | undefined,
+    record: IdOrObject<T, Tid>,
+  ) => {
+    const uri = routing
+      ? `${indexUri}/${routing}${indexSuffix}`
+      : `${indexUri}${indexSuffix}`;
+    return `${uri}/${getId(idProperty, record)}`;
+  };
+
   const entity: Entity<T, Tid> = {
     create: async (attrs) => {
       const record = opts.onCreate
         ? await opts.onCreate(attrs)
         : (attrs || {} as T);
 
-      await request(
-        'PUT',
-        `${indexUri}${indexSuffix}/${getId(idProperty, record)}`,
-        record,
-      );
-
+      const routing = opts.getRouting && opts.getRouting(record);
+      await request('PUT', getRecordUri(routing, record), record);
       return record;
     },
-    delete: idOrObject =>
-      request(
+    delete: async (idOrObject) => {
+      const doc = await getById(idOrObject);
+      if (!doc) return;
+      await request(
         'DELETE',
-        `${indexUri}${indexSuffix}/${getId(idProperty, idOrObject)}`,
-      ),
-    findBy: async (criteria) => {
-      await request('POST', `${indexUri}/_flush`);
-      const doc = await request<QueryResults<T>>(
-        'POST',
-        `${indexUri}${indexSuffix}/_search`,
-        criteria,
+        getRecordUri(doc._routing, doc._source),
       );
-      return doc.hits.hits.map(h => h._source)[0];
     },
-    findById: async (idOrObject) => {
-      const doc = await request<Doc<T>>(
-        'GET',
-        `${indexUri}${indexSuffix}/${getId(idProperty, idOrObject)}`,
-      );
-      return doc._source;
-    },
+    findBy: async criteria =>
+      getSource(await search(criteria)),
+    findById: async idOrObject =>
+      getSource(await getById(idOrObject)),
     update: async (idOrObject, attrs) => {
       const id = getId(idProperty, idOrObject);
       const record = (await entity.findById(idOrObject)) || {};

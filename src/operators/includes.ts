@@ -19,6 +19,8 @@ const recursiveIncludes = (
   return recursiveMatch(actual, expected, path);
 };
 
+const NOT_IN_ARRAY = {};
+
 const findOffendingItem = (actual: any, expected: any): Offending => {
   if (!Array.isArray(actual)) {
     return { actual, path: recursiveIncludes(actual, expected) };
@@ -31,7 +33,7 @@ const findOffendingItem = (actual: any, expected: any): Offending => {
 
   if (items.some(i => !i.path)) return { actual, path: undefined };
 
-  return { actual: null, path: items[0].path };
+  return { actual: NOT_IN_ARRAY, path: items[0].path };
 };
 
 const op: Operator = {
@@ -44,17 +46,14 @@ const op: Operator = {
 
     if (offending.path === undefined) return undefined;
 
-    const actualValue = offending.path
-      ? getDeep(offending.actual, offending.path)
-      : offending.actual;
-
     return {
       assertEquals: true,
       error: 'does not include',
       expected: expectedJson,
-      subError: offending.path
+      subError: offending.actual !== NOT_IN_ARRAY
         ? {
-          actual: actualValue,
+          actual: getDeep(offending.actual, offending.path),
+          expected: getDeep(expectedJson, offending.path),
           path: offending.path,
         }
         : undefined,

@@ -30,6 +30,11 @@ const assertValue = (v: any) => v === undefined
   ? 'undefined'
   : JSON.stringify(v);
 
+const printValue = (o: any) =>
+  typeof o === 'object'
+    ? JSON.stringify(o)
+    : `${o}`;
+
 export const printError = ({
   actual,
   assertEquals,
@@ -44,23 +49,29 @@ export const printError = ({
     ? ` (at ${errorPath})`
     : '';
 
-  const actualValue = subError && subError.actual || actual;
-
+  const actualValue = subError ? subError.actual : actual;
+  const expectedValue = subError ? subError.expected : expected;
   const padd = '    ';
+
+  const fullActual = full || subError && actual;
+
+  const errorMessage = subError
+    ? 'is not'
+    : error;
 
   const message = `
   Error${at}:
-    ${JSON.stringify(actual)} ${error} ${expected}
+    ${JSON.stringify(actualValue)} ${errorMessage} ${printValue(expectedValue)}
   \n\n
   Actual${at}:
     ${prettyJson(actualValue, padd)}
   Expected:
-    ${prettyJson(expected, padd)}
+    ${prettyJson(expectedValue, padd)}
 
-  ${full
+  ${fullActual
     ? `
   Full actual object:
-    ${prettyJson(full, padd)}
+    ${prettyJson(fullActual, padd)}
   `
     : ''
   }
@@ -69,10 +80,9 @@ export const printError = ({
   if (assertEquals) {
     assert.equal(
       assertValue(actualValue),
-      assertValue(expected),
+      assertValue(expectedValue),
       message,
     );
-  } else {
-    assert.fail(message);
   }
+  assert.fail(message);
 };

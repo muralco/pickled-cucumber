@@ -4,6 +4,7 @@ interface OperatorError {
   path?: string;
   subError?: {
     actual: any;
+    expected: any;
     path: string;
   };
 }

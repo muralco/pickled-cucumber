@@ -1,9 +1,11 @@
+export type IdOrObject<T, Tid extends keyof T> = T|T[Tid];
+
 export interface Entity<T, Tid extends keyof T> {
   create: (attrs?: T) => Promise<T>;
-  delete: (idOrObject: T|T[Tid]) => Promise<void>;
+  delete: (idOrObject: IdOrObject<T, Tid>) => Promise<void>;
   findBy: (criteria: object) => Promise<T|undefined|null>;
-  findById: (idOrObject: T|T[Tid]) => Promise<T|undefined|null>;
-  update: (idOrObject: T|T[Tid], attrs: Partial<T>) => Promise<T>;
+  findById: (idOrObject: IdOrObject<T, Tid>) => Promise<T|undefined|null>;
+  update: (idOrObject: IdOrObject<T, Tid>, attrs: Partial<T>) => Promise<T>;
 }
 
 export interface EntityMap {

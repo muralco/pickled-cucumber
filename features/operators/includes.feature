@@ -19,7 +19,7 @@ Scenario: { "a": 1 } includes { "a": 2 }
   Given A is { "a": 1 }
   When asserting that A includes { "a": 2 }
   Then the assertion fails with {"a":1} does not include {"a":2}
-  And the sub error is 1 at "a"
+  And the sub error is: got 1 instead of 2 at "a"
 
 Scenario: [1, 2] includes 1
   Given A is [1, 2]
@@ -30,9 +30,14 @@ Scenario: [{ "a": 1 }] includes { "a": 2 }
   Given A is [{ "a": 1 }]
   When asserting that A includes { "a": 2 }
   Then the assertion fails with [{"a":1}] does not include {"a":2}
-  And the sub error is null at "0.a"
 
 Scenario: [{ "a": 1 }, { "a": 2 }] includes { "a": 2 }
   Given A is [{ "a": 1 }, { "a": 2 }]
   When asserting that A includes { "a": 2 }
   Then the assertion passes
+
+Scenario: { "members": [] } includes { members: ["a"] }
+  Given A is { "members": [] }
+  When asserting that A includes { "members": ["a"] }
+  Then the assertion fails with {"members":[]} does not include {"members":["a"]}
+  And the sub error is: got [] instead of ["a"] at "members"

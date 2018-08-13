@@ -36,8 +36,18 @@ Scenario: [{ "a": 1 }, { "a": 2 }] includes { "a": 2 }
   When asserting that A includes { "a": 2 }
   Then the assertion passes
 
-Scenario: { "members": [] } includes { members: ["a"] }
+Scenario: { "members": [] } includes { "members": ["a"] }
   Given A is { "members": [] }
   When asserting that A includes { "members": ["a"] }
   Then the assertion fails with {"members":[]} does not include {"members":["a"]}
   And the sub error is: got [] instead of ["a"] at "members"
+
+Scenario: { "a": { "b": 1, "c": 1 } } includes { "a": { "b": 1 } }
+  Given A is { "a": { "b": 1, "c": 1 } }
+  When asserting that A includes { "a": { "b": 1 } }
+  Then the assertion passes
+
+Scenario: {} includes { "a": null }
+  Given A is {}
+  When asserting that A includes { "a": null }
+  Then the assertion passes

@@ -1,10 +1,13 @@
 import * as assert from 'assert';
 import { AfterAll } from 'cucumber';
+import nodeFetch from 'node-fetch';
 import { promisify } from 'util';
 import compareJson from './compare-json';
 import createElasticEntity from './entities/elasticsearch';
 import createMongoEntity from './entities/mongodb';
 import { Entity, EntityMap } from './entities/types';
+import httpFetch from './http/fetch';
+import httpSupertest from './http/supertest';
 import setup, { getVariables, Options, SetupFn } from './index';
 import { CompareError } from './operators/types';
 
@@ -82,10 +85,12 @@ if (ELASTIC_URI) {
 // ========================================================================== //
 const options: Options = {
   aliases: {
+    '/api/*': /\/api\/.*/,
     'proper-name': /[A-Z][a-z]*/,
   },
   elasticSearchIndexUri: ELASTIC_URI,
   entities,
+  http: httpFetch(nodeFetch),
   initialContext: () => ({ initialFive: 5 }),
   requireMocks: {
     'totally-random-module': 42,
@@ -158,6 +163,10 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
     'A proper name can be {proper-name}',
     name => assert(!!name.match(/^[A-Z]/)),
   );
+  Then(
+    'the {/api/*} alias matches (.*)',
+    (actual, expected) => assert.equal(actual, expected),
+  );
 
   // === Test `initialContext` ============================================== //
   When(
@@ -190,3 +199,6 @@ assert.deepEqual(getVariables('A'), ['A']);
 assert.deepEqual(getVariables('A, B'), ['A', 'B']);
 assert.deepEqual(getVariables('A and B'), ['A', 'B']);
 assert.deepEqual(getVariables('A, B and C'), ['A', 'B', 'C']);
+
+// === Pin down untested dependencies ======================================= //
+assert(httpSupertest);

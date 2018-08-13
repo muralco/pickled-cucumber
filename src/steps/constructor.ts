@@ -11,16 +11,16 @@ const expand = (ctx: Context) => (str: string) =>
     (_, path) => getDeep(ctx, path),
   );
 
+const replaceAll = (s: string, find: string, replace: string): string =>
+  s.split(find).join(replace);
+
 // Resolve shorthand expressions into actual regexps
 const resolveRegExp = (
   aliases: Aliases,
   regexpString: string,
 ) =>
   Object.keys(aliases).reduce(
-    (acc, k) => acc.replace(
-      new RegExp(`\\{${k}\\}`, 'g'),
-      `(${aliases[k].source})`,
-    ),
+    (acc, k) => replaceAll(acc, `{${k}}`, `(${aliases[k].source})`),
     regexpString,
   );
 

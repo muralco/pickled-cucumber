@@ -16,7 +16,7 @@ const recursiveIncludes = (
     ? { ...actual, ...expectedPartial } // make a whole object from a partial
     : expectedPartial; // is a primitive or array
 
-  return recursiveMatch(actual, expected, path);
+  return recursiveMatch(actual, expected, path, true);
 };
 
 const NOT_IN_ARRAY = {};

@@ -4,6 +4,7 @@ import {
   Before,
   BeforeAll,
   Given,
+  setDefaultTimeout,
   Then,
   When,
 } from 'cucumber';
@@ -12,6 +13,7 @@ import compareJson from './compare-json';
 import { getCtx, getCtxItem, setCtx, setCtxItem } from './context';
 import setupEntities from './entities';
 import { defineElasticSteps } from './entities/elasticsearch';
+import setupHttp from './http';
 import { getOpSpec } from './operators';
 import printOperators, { printError } from './operators/printer';
 import setupRequireMock from './require';
@@ -32,9 +34,11 @@ export type Options = Options;
 
 export type SetupFn = (args: SetupFnArgs) => void;
 
+// Tear down
 const getTearDown = () => getCtxItem<TearDownFn[]>('$tearDown');
-
-After(() => Promise.all(getTearDown().reverse().map(fn => fn())));
+if (!process.env.KEEP_DATA) {
+  After(() => Promise.all(getTearDown().reverse().map(fn => fn())));
+}
 
 const setup = (fn: SetupFn, options: Options = {}) => {
   // Force unhandleded promise rejections to fail (warning => error)
@@ -44,10 +48,14 @@ const setup = (fn: SetupFn, options: Options = {}) => {
     aliases = {},
     elasticSearchIndexUri,
     entities = {},
+    http,
     operators = {},
     requireMocks,
+    timeout,
     usage,
   } = options;
+
+  setDefaultTimeout(timeout || Number(process.env.TEST_TIMEOUT || '10') * 1000);
 
   Before(() => {
     const customCtx = options.initialContext && options.initialContext() || {};
@@ -85,7 +93,9 @@ const setup = (fn: SetupFn, options: Options = {}) => {
   );
 
   const args: SetupFnArgs = {
+    After,
     AfterAll,
+    Before,
     BeforeAll,
     compare: (op, a, e) => {
       const error = compareJson(operators, op, a, e);
@@ -102,6 +112,7 @@ const setup = (fn: SetupFn, options: Options = {}) => {
   if (requireMocks) setupRequireMock(requireMocks);
   if (hasEntities) setupEntities(entities, args);
   if (elasticSearchIndexUri) defineElasticSteps(elasticSearchIndexUri, args);
+  if (http) setupHttp(http, args);
 
   fn(args);
 
@@ -117,6 +128,14 @@ const setup = (fn: SetupFn, options: Options = {}) => {
     console.log('Aliases');
     console.log('-------');
     console.log(printAliases(effectiveAliases));
+    console.log();
+    console.log('Variables');
+    console.log('---------');
+    console.log(`
+    \${varName}          => expands to the value bound to varName
+    \${varName.propName} => expands to the propName property of varName
+    \${varName[0].name}  => expands to the name of the first item of varName
+    `.replace(/^\s+/gm, ''));
   }
 
   steps.forEach((s) => {

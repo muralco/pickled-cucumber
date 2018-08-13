@@ -6,24 +6,32 @@ type Criteria<T, Tid extends keyof T> =
   | Partial<T>
   ;
 
-type Update<T> =
-  | { $set: Partial<T> }
-  ;
+interface Changes<T> {
+  $push?: { [k in keyof T]?: T[k][]; };
+  $set?: Partial<T>;
+  $unset?: { [k in keyof T]?: 1; };
+}
+
+type Void = Promise<void>;
 
 interface MongoClient {
   collection: <T, Tid extends keyof T>(s: string) => Promise<{
-    deleteOne: (criteria: Criteria<T, Tid>) => Promise<void>;
-    insertOne: (o: T) => Promise<void>;
+    deleteOne: (criteria: Criteria<T, Tid>) => Void;
+    insertOne: (o: T) => Void;
     findOne: (criteria: Criteria<T, Tid>) => Promise<T|null>;
-    updateOne: (Criteria: Criteria<T, Tid>, delta: Update<T>) => Promise<void>;
+    updateOne: (Criteria: Criteria<T, Tid>, changes: Changes<T>) => Void;
   }>;
+}
+
+interface Options<T, Tid extends keyof T> extends EntityOptions<T, Tid> {
+  onUpdateChanges?: (changes: Changes<T>) => Changes<T>;
 }
 
 const create = <T, Tid extends keyof T>(
   getDb: () => Promise<MongoClient>,
   collectionName: string,
   idProperty: Tid,
-  opts: EntityOptions<T, Tid> = {},
+  opts: Options<T, Tid> = {},
 ): Entity<T, Tid> => {
   const entity: Entity<T, Tid> = {
     create: async (attrs) => {
@@ -57,13 +65,20 @@ const create = <T, Tid extends keyof T>(
       const db = await getDb();
       const collection = await db.collection(collectionName);
       const id = getId(idProperty, idOrObject);
+
       const record = opts.onUpdate
         ? await opts.onUpdate(attrs, id, entity)
         : attrs;
 
+      const recordChanges = { $set: record };
+
+      const changes = opts.onUpdateChanges
+        ? opts.onUpdateChanges(recordChanges)
+        : recordChanges;
+
       const criteria = { [idProperty]: id };
 
-      await collection.updateOne(criteria, { $set: record });
+      await collection.updateOne(criteria, changes);
 
       return (await entity.findBy(criteria)) as T;
     },

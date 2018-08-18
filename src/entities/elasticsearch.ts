@@ -26,7 +26,7 @@ interface Options<T, Tid extends keyof T> extends EntityOptions<T, Tid> {
 const request = async <T>(
   method: 'DELETE'|'GET'|'POST'|'PUT',
   path: string,
-  body?: any,
+  body?: unknown,
 ): Promise<T> => {
   const res = await fetch(path, {
     body: body !== undefined ? JSON.stringify(body) : undefined,

@@ -2,13 +2,13 @@ import { getDeep, recursiveMatch } from '../util';
 import { Operator } from './types';
 
 interface Offending {
-  actual: any;
+  actual: unknown;
   path: string | undefined;
 }
 
 const recursiveIncludes = (
-  actual: any,
-  expectedPartial: any,
+  actual: unknown,
+  expectedPartial: unknown,
   path?: string,
 ) => {
   const expected = typeof expectedPartial === 'object'
@@ -21,7 +21,7 @@ const recursiveIncludes = (
 
 const NOT_IN_ARRAY = {};
 
-const findOffendingItem = (actual: any, expected: any): Offending => {
+const findOffendingItem = (actual: unknown, expected: string): Offending => {
   if (!Array.isArray(actual)) {
     return { actual, path: recursiveIncludes(actual, expected) };
   }

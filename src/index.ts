@@ -42,7 +42,7 @@ if (!process.env.KEEP_DATA) {
 
 const setup = (fn: SetupFn, options: Options = {}) => {
   // Force unhandleded promise rejections to fail (warning => error)
-  process.on('unhandledRejection', (up: any) => { throw up; });
+  process.on('unhandledRejection', (up: unknown) => { throw up; });
 
   const {
     aliases = {},

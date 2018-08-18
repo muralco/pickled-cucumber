@@ -1,13 +1,15 @@
-export const getString = (actual: string | Object | number | boolean) =>
-  (typeof actual === 'string'
+export const getString = (actual: unknown) =>
+  typeof actual === 'string'
     ? actual
-    : JSON.stringify(actual || ''));
+    : actual === undefined || actual === null
+      ? JSON.stringify('')
+      : JSON.stringify(actual || '');
 
 // Checks `a` and `b` and returns `undefined` if they match (i.e. they are
 // deep equal) or the path where they differ.
 export function recursiveMatch(
-  a: any,
-  b: any,
+  a: unknown,
+  b: unknown,
   path = '',
   partial = false, // if true, allow `a` to have more keys than `b`
 ): string | undefined {
@@ -52,9 +54,18 @@ export function recursiveMatch(
 
   // 6) Both values are objects, they should have the same keys and matching
   // values
+  const aObject = a as object;
+  const bObject = b as object;
   return Object
-    .keys({ ...a, ...b })
-    .map(k => recursiveMatch(a[k], b[k], path ? `${path}.${k}` : k, partial))
+    .keys({ ...aObject, ...bObject })
+    .map((k: keyof (typeof aObject & typeof bObject)) =>
+        recursiveMatch(
+          aObject[k],
+          bObject[k],
+          path ? `${path}.${k}` : k,
+          partial,
+        ),
+      )
     .find(path => path !== undefined);
 }
 
@@ -64,10 +75,12 @@ const getProp = (o: any, prop: string): any|undefined => {
   const [name, index] = (prop.match(IDX_REGEX) || []).slice(1);
   return name
     ? o[name][Number(index)]
-    : o[prop];
+    : index
+      ? o[Number(index)]
+      : o[prop];
 };
 
-export const getDeep = (o: any, path: string): any|undefined =>
+export const getDeep = (o: unknown, path: string): unknown|undefined =>
   path.split('.').reduce(
     (acc, k) => acc === undefined || acc === null
       ? undefined

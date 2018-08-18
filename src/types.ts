@@ -4,7 +4,7 @@ import { OperatorMap } from './operators/types';
 import { StepFn, StepOptions } from './steps/types';
 
 export interface Context {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface Aliases {
@@ -12,7 +12,7 @@ export interface Aliases {
 }
 
 export interface RequireMockMap {
-  [module: string]: any;
+  [module: string]: unknown;
 }
 
 export interface Options {
@@ -42,7 +42,7 @@ export interface SetupFnArgs {
   Before: HookFn;
   BeforeAll: HookFn;
   getCtx: <T>(name: string) => T;
-  compare: (op: string, actual: any, expected: any) => void;
+  compare: (op: string, actual: unknown, expected: string) => void;
   Given: StepDefinitionFn;
   onTearDown: (fn: TearDownFn) => void;
   setCtx: <T>(name: string, value: T) => void;

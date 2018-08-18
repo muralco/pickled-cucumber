@@ -8,7 +8,7 @@ import { Step, StepFn, StepKind, StepOptions } from './types';
 const expand = (ctx: Context) => (str: string) =>
    str && str.toString().replace(
     /\$\{([^}]+)\}/g,
-    (_, path) => getDeep(ctx, path),
+    (_, path) => `${getDeep(ctx, path)}`,
   );
 
 const replaceAll = (s: string, find: string, replace: string): string =>

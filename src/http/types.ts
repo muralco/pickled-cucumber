@@ -5,8 +5,8 @@ export interface Headers {
 export type Method = 'DELETE'|'GET'|'PATCH'|'POST'|'PUT';
 
 export interface Request {
-  body?: any;
-  credentials?: any;
+  body?: unknown;
+  credentials?: unknown;
   headers?: Headers;
   method: Method;
   path: string;

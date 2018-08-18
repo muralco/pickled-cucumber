@@ -12,15 +12,15 @@ interface SuperTestResponse {
 
 type ParseFn = (
   res: SuperTestResponse,
-  cb: (error: any, text: string) => void,
+  cb: (error: unknown, text: string) => void,
 ) => void;
 
 interface SuperTestRequest {
-  send: (payload: any) => SuperTestRequest;
+  send: (payload: unknown) => SuperTestRequest;
   set: (headerName: string, headerValue: string) => SuperTestRequest;
   buffer: (b: true) => SuperTestRequest;
   parse: (fn: ParseFn) => SuperTestRequest;
-  end: (cb: (err: any, res: SuperTestResponse) => void) => void;
+  end: (cb: (err: unknown, res: SuperTestResponse) => void) => void;
 }
 
 type SuperTestFn = (path: string) => SuperTestRequest;

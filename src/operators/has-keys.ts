@@ -5,8 +5,11 @@ const op: Operator = {
   description: `checks that the object 'a' has all the keys in array 'b'`,
   error: '',
   exec: (actual, expected) => {
+    const actualObject = typeof actual === 'object'
+      ? actual as object
+      : {};
     const expectedKeys: string[] = JSON.parse(expected);
-    const missing = expectedKeys.filter(k => !actual.hasOwnProperty(k));
+    const missing = expectedKeys.filter(k => !actualObject.hasOwnProperty(k));
     const error = missing.length === 1
       ? 'does not have key'
       : 'does not have keys';

@@ -61,7 +61,7 @@ const setup = (
       `,
     );
   };
-  const assertPayload = (raw: boolean, op: string, payload: any) => compare(
+  const assertPayload = (raw: boolean, op: string, payload: string) => compare(
     op,
     getResponseBody(raw),
     payload,

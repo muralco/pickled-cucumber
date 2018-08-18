@@ -23,14 +23,14 @@ export default (ops: OperatorMap) => {
     .join('');
 };
 
-const prettyJson = (o: any, p: string = '') =>
+const prettyJson = (o: unknown, p: string = '') =>
   `${JSON.stringify(o, undefined, 2)}`.replace(/\n/g, `\n${p}`);
 
-const assertValue = (v: any) => v === undefined
+const assertValue = (v: unknown) => v === undefined
   ? 'undefined'
   : JSON.stringify(v);
 
-const printValue = (o: any) =>
+const printValue = (o: unknown) =>
   typeof o === 'object'
     ? JSON.stringify(o)
     : `${o}`;

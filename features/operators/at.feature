@@ -17,7 +17,12 @@ Scenario: { "a": [1] } at a.0 is 1
   When asserting that A at a.0 is 1
   Then the assertion passes
 
-Scenario: { "a": [1] } at a.0 is 1
+Scenario: { "a": [1] } at a[0] is 1
   Given A is { "a": [1] }
   When asserting that A at a[0] is 1
+  Then the assertion passes
+
+Scenario: [1] at [0] is 1
+  Given A is [1]
+  When asserting that A at [0] is 1
   Then the assertion passes

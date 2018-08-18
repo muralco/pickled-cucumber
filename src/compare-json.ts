@@ -7,7 +7,7 @@ const atRegExp = new RegExp(`^at (${opAtSpec}) (.*)$`);
 function compareJson(
   ops: OperatorMap,
   opName: string,
-  actual: any,
+  actual: unknown,
   expected: string,
 ): CompareResult {
 

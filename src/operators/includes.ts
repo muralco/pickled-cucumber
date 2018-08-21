@@ -31,7 +31,13 @@ const findOffendingItem = (actual: unknown, expected: string): Offending => {
     path: recursiveIncludes(a, expected, `${i}`),
   }));
 
-  if (items.some(i => !i.path)) return { actual, path: undefined };
+  if (items.some(i => !i.path)) {
+    return { actual, path: undefined };
+  }
+
+  if (!items.length) {
+    return { actual: NOT_IN_ARRAY, path: '0' };
+  }
 
   return { actual: NOT_IN_ARRAY, path: items[0].path };
 };

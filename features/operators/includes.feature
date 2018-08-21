@@ -51,3 +51,8 @@ Scenario: {} includes { "a": null }
   Given A is {}
   When asserting that A includes { "a": null }
   Then the assertion passes
+
+Scenario: [] includes { "a": 1 }
+  Given A is []
+  When asserting that A includes { "a": 1 }
+  Then the assertion fails with [] does not include {"a":1}

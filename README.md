@@ -414,15 +414,42 @@ Then the user at creationDate is ${now}
 
 ### Entities Module
 
-TBD
+The _entities module_ allows you to test data persistence in your apps.
 
-#### MongoDB
+For example, consider the following test:
 
-TBD
+```gherkin
+Given a user U with { "id": 1, "name": "John" }
+When PATCH /api/users/1 with payload { "name": "Ringo" }
+Then the document for user U at name is "Ringo"
+```
 
-#### ElasticSearch
+Assuming that the `When` step was defined somehow (e.g. by the _http module_),
+defining a `user` entity gives you both `Given` and `Then` steps above and
+many more.
 
-TBD
+To enable the _entities module_ just specify `entities` in the setup options.
+
+For example:
+
+```js
+const options = {
+  entities: {
+    user: someUserEntityDefinition,
+  },
+};
+
+const fn = (args) => {
+  // define your steps here using args
+}
+
+setup(fn, options);
+```
+
+Because there is a lot more to this module, we have more detailed
+documentation in a separate place, see:
+
+> [Entities Module](docs/entities.md#entities-module).
 
 ### Operators Module
 

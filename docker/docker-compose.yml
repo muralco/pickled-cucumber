@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  test:
+    depends_on:
+      - elasticsearch
+      - mongodb
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/test
+      - ELASTIC_URI=http://elasticsearch:9200
+    volumes:
+      - ../features:/usr/src/features
+      - ../src:/usr/src/src
+
+  elasticsearch:
+    image: elasticsearch:latest
+
+  mongodb:
+    image: mongo:latest

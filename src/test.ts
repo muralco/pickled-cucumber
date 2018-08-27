@@ -44,7 +44,7 @@ const boxEntity: Entity<Box, 'id'> = {
 entities['box'] = boxEntity;
 
 // === Test `entities/mongo` ================================================ //
-if (process.env.MONGODB) {
+if (process.env.MONGO_URI) {
   const mongo = require('mongodb');
   let client: any;
   let connected = false;
@@ -53,7 +53,7 @@ if (process.env.MONGODB) {
     if (client) return client;
 
     client = promisify(mongo.MongoClient.connect)(
-      'mongodb://localhost:27017/test',
+      process.env.MONGO_URI,
     );
 
     await client;

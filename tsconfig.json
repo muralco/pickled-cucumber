@@ -4,6 +4,7 @@
     "module": "commonjs",
     "outDir": "./dist",
     "noImplicitAny": true,
+    "strict": true,
     "strictNullChecks": true,
     "noEmitOnError": true,
     "noUnusedParameters": true,

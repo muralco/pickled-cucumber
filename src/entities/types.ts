@@ -9,7 +9,7 @@ export interface Entity<T, Tid extends keyof T> {
 }
 
 export interface EntityMap {
-  [name: string]: Entity<any, string|number>;
+  [name: string]: Entity<any, any>;
 }
 
 export interface EntityOptions<T, Tid extends keyof T> {

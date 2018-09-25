@@ -54,11 +54,11 @@ export function recursiveMatch(
 
   // 6) Both values are objects, they should have the same keys and matching
   // values
-  const aObject = a as object;
-  const bObject = b as object;
+  const aObject = a as { [k: string]: unknown };
+  const bObject = b as { [k: string]: unknown };
   return Object
     .keys({ ...aObject, ...bObject })
-    .map((k: keyof (typeof aObject & typeof bObject)) =>
+    .map((k: string) =>
         recursiveMatch(
           aObject[k],
           bObject[k],

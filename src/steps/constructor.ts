@@ -3,12 +3,19 @@ import { Aliases, Context } from '../types';
 import { getDeep } from '../util';
 import { Step, StepFn, StepKind, StepOptions } from './types';
 
+const getDeepString = (ctx: Context, path: string): string => {
+  const v = getDeep(ctx, path);
+  return typeof v === 'string'
+    ? v
+    : JSON.stringify(v);
+};
+
 // For each key `var` in `ctx`, replaces all occurrences of `${var}` in `str`
 // with `ctx[var]` .
 const expand = (ctx: Context) => (str: string) =>
    str && str.toString().replace(
     /\$\{([^}]+)\}/g,
-    (_, path) => `${getDeep(ctx, path)}`,
+    (_, path) => getDeepString(ctx, path),
   );
 
 const replaceAll = (s: string, find: string, replace: string): string =>

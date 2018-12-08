@@ -190,6 +190,13 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
     'the value of the global initialTen is {int}',
     val => assert.equal(initialTen, parseInt(val, 10)),
   );
+
+  // === Test expansion ===================================================== //
+  Then(
+    'variable {variable} has value (.*)',
+    (name, val) => assert.equal(getCtx(name), val),
+  );
+
 };
 
 setup(fn, options);

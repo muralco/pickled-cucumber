@@ -4,8 +4,8 @@ const aliases: Aliases = {
   any: /.*/,
   boolean: /true|false/,
   int: /\d+/,
-  variable: /\w+/,
-  variables: /\w+(?:,\s*\w+|\s+and\s+\w+)*/,
+  variable: /[\w._-]+/,
+  variables: /[\w._-]+(?:,\s*[\w._-]+|\s+and\s+[\w._-]+)*/,
   word: /\S+/,
 };
 

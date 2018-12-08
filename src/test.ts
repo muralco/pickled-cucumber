@@ -91,7 +91,14 @@ const options: Options = {
   elasticSearchIndexUri: ELASTIC_URI,
   entities,
   http: httpFetch(nodeFetch),
-  initialContext: () => ({ initialFive: 5 }),
+  initialContext: () => ({
+    deeply: {
+      nested: {
+        string: 'hello!',
+      },
+    },
+    initialFive: 5,
+  }),
   requireMocks: {
     'totally-random-module': 42,
   },

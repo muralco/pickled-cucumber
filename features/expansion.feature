@@ -33,3 +33,12 @@ Scenario: multiple expansion (order matters)
     }
     """
   Then variable Q has value "pool, pool, deadpool"
+
+Scenario: multiple expansion (order matters)
+  And variable Q results from expanding deeply.nested.string with
+    """
+    {
+      "hello": "goodbye"
+    }
+    """
+  Then variable Q has value goodbye!

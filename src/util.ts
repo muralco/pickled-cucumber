@@ -81,9 +81,11 @@ const getProp = (o: any, prop: string): any|undefined => {
 };
 
 export const getDeep = (o: unknown, path: string): unknown|undefined =>
-  path.split('.').reduce(
-    (acc, k) => acc === undefined || acc === null
-      ? undefined
-      : getProp(acc, k),
-    o,
-  );
+  path === undefined
+    ? undefined
+    : path.split('.').reduce(
+      (acc, k) => acc === undefined || acc === null
+        ? undefined
+        : getProp(acc, k),
+      o,
+    );

@@ -10,7 +10,7 @@ import {
 } from 'cucumber';
 import printAliases from './aliases/printer';
 import compareJson from './compare-json';
-import { getCtx, getCtxItem, setCtx, setCtxItem } from './context';
+import { getCtx, getCtxItem, pushCtxItem, setCtx, setCtxItem } from './context';
 import setupEntities from './entities';
 import { defineElasticSteps } from './entities/elasticsearch';
 import setupHttp from './http';
@@ -116,6 +116,7 @@ const setup = (fn: SetupFn, options: Options = {}) => {
     getCtx: getCtxItem,
     Given: step('Given'),
     onTearDown: fn => getTearDown().push(fn),
+    pushCtx: pushCtxItem,
     setCtx: setCtxItem,
     Then: step('Then'),
     When: step('When'),

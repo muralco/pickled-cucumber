@@ -41,10 +41,11 @@ export interface SetupFnArgs {
   AfterAll: HookFn;
   Before: HookFn;
   BeforeAll: HookFn;
-  getCtx: <T>(name: string) => T;
   compare: (op: string, actual: unknown, expected: string) => void;
+  getCtx: <T>(name: string) => T;
   Given: StepDefinitionFn;
   onTearDown: (fn: TearDownFn) => void;
+  pushCtx: <T>(name: string, value: T) => void;
   setCtx: <T>(name: string, value: T) => void;
   Then: StepDefinitionFn;
   When: StepDefinitionFn;

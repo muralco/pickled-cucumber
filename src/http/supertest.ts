@@ -20,7 +20,7 @@ interface SuperTestRequest {
   set: (headerName: string, headerValue: string) => SuperTestRequest;
   buffer: (b: true) => SuperTestRequest;
   parse: (fn: ParseFn) => SuperTestRequest;
-  end: (cb: (err: unknown, res: SuperTestResponse) => void) => void;
+  end: (cb: (err: Error | null, res: SuperTestResponse) => void) => void;
 }
 
 type SuperTestFn = (path: string) => SuperTestRequest;

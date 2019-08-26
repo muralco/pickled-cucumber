@@ -17,6 +17,7 @@ export interface RequireMockMap {
 
 export interface Options {
   aliases?: Aliases;
+  debug?: boolean;
   elasticSearchIndexUri?: string;
   entities?: EntityMap;
   initialContext?: () => Context;

@@ -16,7 +16,7 @@ services:
       - ../src:/usr/src/src
 
   elasticsearch:
-    image: elasticsearch:latest
+    image: elasticsearch:2.2.0
 
   mongodb:
     image: mongo:latest

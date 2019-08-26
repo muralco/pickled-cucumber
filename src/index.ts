@@ -11,6 +11,7 @@ import {
 import printAliases from './aliases/printer';
 import compareJson from './compare-json';
 import { getCtx, getCtxItem, pushCtxItem, setCtx, setCtxItem } from './context';
+import setupDebug from './debug';
 import setupEntities from './entities';
 import { defineElasticSteps } from './entities/elasticsearch';
 import setupHttp from './http';
@@ -46,6 +47,7 @@ const setup = (fn: SetupFn, options: Options = {}) => {
 
   const {
     aliases = {},
+    debug,
     elasticSearchIndexUri,
     entities = {},
     http,
@@ -150,6 +152,8 @@ const setup = (fn: SetupFn, options: Options = {}) => {
     \${varName[0].name}  => expands to the name of the first item of varName
     `.replace(/^\s+/gm, ''));
   }
+
+  if (debug) setupDebug(steps);
 
   steps.forEach((s) => {
     switch (s.kind) {

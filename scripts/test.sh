@@ -18,6 +18,7 @@ if [ -z "$WITH_ELASTIC" ]; then TAGS="$TAGS and not @elasticsearch"; fi
 runTest() {
   echo "Tags: $TAGS"
 
+  TS_NODE_FILES=true \
   MONGO_URI=$WITH_MONGODB \
   ELASTIC_URI=$WITH_ELASTIC \
   ./node_modules/.bin/cucumber-js \

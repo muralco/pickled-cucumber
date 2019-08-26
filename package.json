@@ -1,6 +1,6 @@
 {
   "name": "pickled-cucumber",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Cucumber test runner with several condiments",
   "main": "index.js",
   "types": "index.d.ts",
@@ -15,7 +15,7 @@
   },
   "homepage": "https://github.com/muralco/pickled-cucumber",
   "devDependencies": {
-    "@types/cucumber": "^4.0.4",
+    "@types/cucumber": "^4.0.7",
     "@types/node": "^10.5.2",
     "@types/node-fetch": "^2.1.2",
     "ts-unused-exports": "^2.0.10",

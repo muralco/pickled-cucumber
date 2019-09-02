@@ -162,6 +162,8 @@ const setup = (fn: SetupFn, options: Options = {}) => {
       case 'When': return When(s.regexp, s.fn);
     }
   });
+
+  return steps;
 };
 
 export default setup;

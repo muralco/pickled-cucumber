@@ -1,4 +1,5 @@
 import opContains from './contains';
+import opDoesNotHaveKeys from './does-not-have-keys';
 import opExists from './exists';
 import opHasKeys from './has-keys';
 import opIncludes from './includes';
@@ -9,6 +10,7 @@ import { OperatorMap } from './types';
 
 const OPERATORS = [
   opContains,
+  opDoesNotHaveKeys,
   opExists,
   opHasKeys,
   opIncludes,

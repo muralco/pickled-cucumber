@@ -31,7 +31,7 @@ export function recursiveMatch(
   // 4) Handle arrays
   if (Array.isArray(a) || Array.isArray(b)) {
     // Fail if one is an array and the other is not, or when the arrays have
-    // diffrent sizes
+    // different sizes
     if (!Array.isArray(a)
       || !Array.isArray(b)
       || a.length !== b.length

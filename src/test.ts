@@ -4,8 +4,9 @@ import nodeFetch from 'node-fetch';
 import { promisify } from 'util';
 import compareJson from './compare-json';
 import createElasticEntity from './entities/elasticsearch';
+import createMemoryEntity from './entities/memory';
 import createMongoEntity from './entities/mongodb';
-import { Entity, EntityMap } from './entities/types';
+import { EntityMap } from './entities/types';
 import httpFetch from './http/fetch';
 import httpSupertest from './http/supertest';
 import setup, { getVariables, Options, SetupFn } from './index';
@@ -20,28 +21,8 @@ const ELASTIC_URI = process.env.ELASTIC_URI
 const entities: EntityMap = {};
 
 interface Box { id: number; color: string; }
-const boxes: Box[] = [];
-const boxEntity: Entity<Box, 'id'> = {
-  create: async (r = { id: 0, color: 'random' }) => {
-    const b = { ...r, id: boxes.length };
-    boxes.push(b);
-    return b;
-  },
-  delete: async (r) => {
-    const box = await boxEntity.findById(r);
-    if (!box) return;
-    boxes.splice(boxes.findIndex(b => b === box), 1);
-  },
-  findBy: async r =>
-    boxes.find(b => b === r || b.id === (r as Box).id),
-  findById: r =>
-    boxEntity.findBy({ id: typeof r === 'number' ? r : r && r.id }),
-  update: async (r, u) => {
-    const box = (await boxEntity.findById(r)) as Box;
-    return Object.assign(box, u);
-  },
-};
-entities['box'] = boxEntity;
+let boxId = 0;
+entities['box'] = createMemoryEntity<Box, 'id'>('id', () => boxId += 1);
 
 // === Test `entities/mongo` ================================================ //
 if (process.env.MONGO_URI) {

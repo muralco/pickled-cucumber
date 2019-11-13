@@ -80,10 +80,13 @@ const getProp = (o: any, prop: string): any|undefined => {
       : o[prop];
 };
 
+const getPathSegments = (path: string) =>
+  (path.match(/"[^"]*"|[^.]+/g) || []).map(k => k.replace(/^"(.*)"$/, '$1'));
+
 export const getDeep = (o: unknown, path: string): unknown|undefined =>
   path === undefined
     ? undefined
-    : path.split('.').reduce(
+    : getPathSegments(path).reduce(
       (acc, k) => acc === undefined || acc === null
         ? undefined
         : getProp(acc, k),

@@ -28,7 +28,7 @@ const OPERATORS = [
 
 export default OPERATORS;
 
-export const opAtSpec = '[\\w.\\[\\]\\$\\{\\}/\\\\-]+';
+export const opAtSpec = '[\\w.\\[\\]\\$\\{\\}/\\\\"-]+';
 
 export const getOpSpec = (ops: OperatorMap = {}): RegExp => {
   const keys = Object.keys({ ...ops, ...OPERATORS })

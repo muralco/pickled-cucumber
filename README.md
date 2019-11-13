@@ -269,6 +269,10 @@ Additionally, the `at` operator allows you to compare a (deeply nested) property
 of `actual`. The syntax for `at` is: `at {path}` where path is a property name
 a series of property names separated by dots (e.g. `address.zipCode`).
 
+If a key of the `actual` object happens to contain one or more `.`s you can
+quote the `at` path segment with `"` to target the element. For example, the `1`
+in `{ "a": { "b.c": 1 } }` can be targeted with `a."b.c"`.
+
 ##### Tear down
 
 Let's say that you have a `Given a user {variable}` step that creates a user in

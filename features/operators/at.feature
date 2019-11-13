@@ -36,3 +36,18 @@ Scenario: { "a\\b": 1 } at a\b is 1
   Given A is { "a\\b": 1 }
   When asserting that A at a\b is 1
   Then the assertion passes
+
+Scenario: { "a": { "b": 1 } } at a.b is 1
+  Given A is { "a": { "b": 1 } }
+  When asserting that A at a.b is 1
+  Then the assertion passes
+
+Scenario: { "a.b": 1 } at "a.b" is 1
+  Given A is { "a.b": 1 }
+  When asserting that A at "a.b" is 1
+  Then the assertion passes
+
+Scenario: { "a": { "b.c": { "d": 1 } } } at a."b.c".d is 1
+  Given A is { "a": { "b.c": { "d": 1 } } }
+  When asserting that A at a."b.c".d is 1
+  Then the assertion passes

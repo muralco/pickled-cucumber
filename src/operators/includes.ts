@@ -6,13 +6,15 @@ interface Offending {
   path: string | undefined;
 }
 
+const isObject = (item: unknown): item is Object =>
+  typeof item === 'object' && !Array.isArray(item) && item !== null;
+
 const recursiveIncludes = (
   actual: unknown,
   expectedPartial: unknown,
   path?: string,
 ) => {
-  const expected = typeof expectedPartial === 'object'
-    && !Array.isArray(expectedPartial)
+  const expected = isObject(actual) && isObject(expectedPartial)
     ? { ...actual, ...expectedPartial } // make a whole object from a partial
     : expectedPartial; // is a primitive or array
 

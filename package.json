@@ -1,6 +1,6 @@
 {
   "name": "pickled-cucumber",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "description": "Cucumber test runner with several condiments",
   "main": "index.js",
   "types": "index.d.ts",
@@ -16,12 +16,12 @@
   "homepage": "https://github.com/muralco/pickled-cucumber",
   "devDependencies": {
     "@types/cucumber": "^4.0.7",
-    "@types/node": "^10.5.2",
+    "@types/node": "^12.12.14",
     "@types/node-fetch": "^2.1.2",
     "ts-unused-exports": "^2.0.10",
     "tslint": "^5.11.0",
     "tslint-config-airbnb": "^5.9.2",
-    "typescript": "^3.5.2"
+    "typescript": "^3.7.3"
   },
   "dependencies": {
     "cucumber": "^4.2.1",

@@ -23,7 +23,7 @@ import printSteps from './steps/printer';
 import { Step, StepKind } from './steps/types';
 import {
   Aliases,
-  Options,
+  Options as BaseOptions,
   SetupFnArgs,
   StepDefinitionFn,
   TearDownFn,
@@ -31,7 +31,7 @@ import {
 
 export { getVariables } from './aliases';
 
-export type Options = Options;
+export type Options = BaseOptions;
 
 export type SetupFn = (args: SetupFnArgs) => void;
 

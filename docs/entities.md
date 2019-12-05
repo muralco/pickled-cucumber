@@ -181,7 +181,7 @@ const options = {
 };
 ```
 
-Here how one of those `create*Entity` functions would be implemented:
+Here is how one of those `create*Entity` functions could be implemented:
 
 ```js
 const createSomeSqlEntity = (tableName) => ({
@@ -225,7 +225,7 @@ const createSomeSqlEntity = (tableName) => ({
 });
 ```
 
-Do note that just like `tableName` you can specify any number of arguments you
+Do note that just like `tableName`, you can specify any number of arguments you
 need in order to define your entity. Check the _built-in_ implementations for
 inspiration.
 

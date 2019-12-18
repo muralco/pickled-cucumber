@@ -54,8 +54,10 @@ const create = <T, Tid extends keyof T>(
   opts: Options<T, Tid> = {},
 ): Entity<T, Tid> => {
 
+  const flush = () => request('POST', `${indexUri}/_flush`);
+
   const search = async (criteria: object) => {
-    await request('POST', `${indexUri}/_flush`);
+    await flush();
     const docs = await request<QueryResults<T>>(
       'POST',
       `${indexUri}/_search`,
@@ -85,6 +87,7 @@ const create = <T, Tid extends keyof T>(
 
       const routing = opts.getRouting && opts.getRouting(record);
       await request('PUT', getRecordUri(routing, record), record);
+      await flush();
       return record;
     },
     delete: async (idOrObject) => {
@@ -94,6 +97,7 @@ const create = <T, Tid extends keyof T>(
         'DELETE',
         getRecordUri(doc._routing, doc._source),
       );
+      await flush();
     },
     findBy: async criteria =>
       getSource(await search(criteria)),
@@ -109,7 +113,7 @@ const create = <T, Tid extends keyof T>(
         : recordWithAttrs;
 
       await entity.create(recordWithChanges);
-
+      await flush();
       return recordWithChanges;
     },
   };

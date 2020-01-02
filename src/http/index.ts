@@ -26,7 +26,7 @@ const setup = (
   );
 
   When(
-    '(GET|POST|PUT|PATCH|DELETE) {word}(?: as {variable})?',
+    '(GET|POST|PUT|PATCH|DELETE|OPTIONS) {word}(?: as {variable})?',
     async (method, path, varName, payload) => {
       const credentials = varName && getCtx(varName);
 

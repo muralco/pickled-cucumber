@@ -1,7 +1,7 @@
-Picked cucumber
+Pickled cucumber
 ===============
 
-## Descirption
+## Description
 
 Pickled cucumber is a Gherkin implementation with several condiments.
 
@@ -43,7 +43,7 @@ which tests should be executed.
 
 ## Modules
 
-`pickled-cucumber` has serveral modules you can opt-in during setup by specifing
+`pickled-cucumber` has serveral modules you can opt-in during setup by specifying
 different configurations in the `options` argument to `setup`. In this section
 we'll go through these modules one by one.
 
@@ -65,10 +65,10 @@ shared acorss scenarios). This scenario scope is called the _context_. We'll
 cover how to manipulate the context in this section in a moment.
 
 As with regular variables in most programming languages there are two things you
-want to do with variables, assign them a value and read the value from the
+want to do with variables: assign them a value, and read the value from the
 variable.
 
-To assign a value to a variable you can use the built in cucumber step:
+To assign a value to a variable you can use the built-in cucumber step:
 
 ```gherkin
 Given variable {variable} is (.+)`
@@ -82,9 +82,9 @@ For example:
 Given variable A is "hello, world"
 ```
 
-As with most steps in `pickled-cucumber` you have two variants of the same step,
-one with an inline value (the one above) and you that accepts the value in a
-docstring in the next line(s), for example:
+As with most steps in `pickled-cucumber` you have two variants of the same step:
+one with an inline value (the one above), and one that accepts the value in a
+docstring in the next line(s). For example:
 
 ```gherkin
 Given variable Person is
@@ -96,8 +96,8 @@ Given variable Person is
   """
 ```
 
-Alternatively, you can programatically assign a value to variable inside a step
-definition using the `setCtx` function, for example:
+Alternatively, you can programatically assign a value to a variable inside a step
+definition, using the `setCtx` function. For example:
 
 ```js
 const fn = ({ setCtx, Given }) => {
@@ -107,7 +107,7 @@ const fn = ({ setCtx, Given }) => {
 setup(fn);
 ```
 
-Whis this definition, both steps below do the same thing:
+With this definition, both steps below do the same thing:
 
 ```gherkin
 Given my name is John
@@ -115,12 +115,12 @@ Given variable N is "John"
 ```
 
 Assigning a variable programmatically can be useful to store the result of
-some processing in a `When` step to, later, assert that result using `Then`
+processing a `When` step. Later, the result can be tested using `Then`
 steps.
 
-Now here is where things get really interesting, variables can be interpolated
-into any steps in `pickled-cucumber` in a similar fashion as how you would
-interpolate strings in JS. 
+Now here is where things get really interesting: variables can be interpolated
+into any steps in `pickled-cucumber` in a similar fashion as how strings
+are interpolated in JavaScript. 
 
 For example:
 
@@ -189,7 +189,7 @@ setup(fn);
 ```
 
 The step text is a string that represents a regular expression (hence the
-`(.+)`). While this is very flexible it can be quite hard to understand.
+`(.+)`). While this is very flexible, it can be quite hard to understand.
 
 To  address this issue, `pickled-cucumber` comes with built-in aliases that make
 step definitions a lot easier to read.
@@ -276,7 +276,7 @@ in `{ "a": { "b.c": 1 } }` can be targeted with `a."b.c"`.
 ##### Tear down
 
 Let's say that you have a `Given a user {variable}` step that creates a user in
-your the DB and stores the user in the variable. After a test finishes it would
+your database (DB) and stores the user in the variable. After a test finishes, it would
 be polite for your step to delete that user from the DB to keep things tidy.
 
 You can accomplish this by registering tear-down logic using the `onTearDown`
@@ -350,8 +350,6 @@ Aliases
 {variable}:  \w+
 {variables}: \w+(?:,\s*\w+|\s+and\s+\w+)*
 {word}:      \S+
-
-
 
 0 scenarios
 0 steps

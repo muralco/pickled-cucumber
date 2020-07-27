@@ -1,12 +1,13 @@
 interface OperatorError {
   error: string;
-  expected: unknown;
+  expected?: unknown;
   path?: string;
   subError?: {
     actual: unknown;
     expected: unknown;
     path: string;
   };
+  unary?: boolean;
 }
 
 export interface CompareError extends OperatorError {
@@ -21,7 +22,6 @@ export type CompareResult = CompareError | undefined;
 export interface Operator {
   arity: 'binary' | 'unary';
   description: string;
-  error: string;
   exec: (actual: unknown, expected: string) => undefined | OperatorError;
   name: string | string[];
 }

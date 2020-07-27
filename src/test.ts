@@ -122,7 +122,9 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
       const r = getResult();
       assert(r, 'the assertion passed');
       assert.deepEqual(
-        `${JSON.stringify(r.actual)} ${r.error} ${JSON.stringify(r.expected)}`,
+        `${JSON.stringify(r.actual)} ${r.error}${
+          !r.unary ? ` ${JSON.stringify(r.expected)}` : ''
+        }`,
         expected,
       );
     });

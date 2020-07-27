@@ -92,3 +92,13 @@ export const getDeep = (o: unknown, path: string): unknown|undefined =>
         : getProp(acc, k),
       o,
     );
+
+export const stringToRegexp = (str: string): RegExp => {
+  const [flags] = (str.match(/\/([gimuy]+)$/) || []).slice(1);
+
+  const expectedString = str
+    .replace(/^\/(.*)\/[gimuy]*$/, '$1')
+    .replace(/^"(.*)"$/, '$1');
+
+  return new RegExp(expectedString, flags);
+};

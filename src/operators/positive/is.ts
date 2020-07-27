@@ -1,10 +1,9 @@
-import { recursiveMatch } from '../util';
-import { Operator } from './types';
+import { recursiveMatch } from '../../util';
+import { Operator } from '../types';
 
 const op: Operator = {
   arity: 'binary',
   description: `checks that 'a' deep equals 'b'`,
-  error: '',
   exec: (actual, expected) => {
     if (expected === 'null' && actual === null) return undefined;
     const isUndef = expected === 'undefined';

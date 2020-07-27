@@ -15,6 +15,7 @@ import setupDebug from './debug';
 import setupEntities from './entities';
 import { defineElasticSteps } from './entities/elasticsearch';
 import setupHttp from './http';
+import setupMisc from './misc';
 import { getOpSpec } from './operators';
 import printOperators, { printError } from './operators/printer';
 import setupRequireMock from './require';
@@ -88,24 +89,6 @@ const setup = (fn: SetupFn, options: Options = {}) => {
     return steps;
   };
 
-  step('Given')(
-    'variable {variable} is',
-    (id, payload) => setCtxItem(id, payload),
-    { inline: true },
-  );
-  step('Given')(
-    'variable {variable} results from expanding {variable} with',
-    (target, source, replaces) => {
-      const items = JSON.parse(replaces) as { [key: string]: string };
-      const expanded = Object.keys(items).reduce(
-        (acc, k) => acc.replace(new RegExp(k, 'g'), items[k]),
-        getCtxItem<string>(source),
-      );
-      setCtxItem(target, expanded);
-    },
-    { inline: true },
-  );
-
   const args: SetupFnArgs = {
     After,
     AfterAll,
@@ -124,6 +107,7 @@ const setup = (fn: SetupFn, options: Options = {}) => {
     When: step('When'),
   };
 
+  setupMisc(args);
   if (requireMocks) setupRequireMock(requireMocks);
   if (hasEntities) setupEntities(entities, args);
   if (elasticSearchIndexUri) defineElasticSteps(elasticSearchIndexUri, args);

@@ -7,7 +7,7 @@ const op: Operator = {
     actual
       ? { error: 'is not falsey', unary: true }
       : undefined,
-  name: 'does not exist',
+  name: ['does not exist', 'do not exist'],
 };
 
 export default op;

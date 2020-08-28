@@ -1,6 +1,6 @@
 {
   "name": "pickled-cucumber",
-  "version": "2.1.0-beta",
+  "version": "2.1.0",
   "description": "Cucumber test runner with several condiments",
   "main": "index.js",
   "types": "index.d.ts",

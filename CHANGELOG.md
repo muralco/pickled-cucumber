@@ -5,15 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-## [2.1.1-beta] - YYYY-MM-DD
+## [2.1.1] - YYYY-MM-DD
 
 ### Added
-  - redis entities adapter?
+  - redis entities adapter
   - documentation on how to extend operators
   - documentation on require mocks
-  - what is require mocks (README at the end)?
 
-## [2.1.0-beta] - YYYY-MM-DD
+## [2.1.0] - YYYY-MM-DD
 
 ### Added
   - new step to assert context variables `the variable {variable} {op}`

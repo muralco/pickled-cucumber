@@ -10,6 +10,6 @@ Scenario: boxes
   And the box B3 was deleted
 
 Scenario: previous boxes should not exist
-  And the document for the box with { "color": "red" } does not exist in context
+  Then the document for the box with { "color": "red" } does not exist in context
   And the document for the box with { "color": "green" } does not exist in context
   And the document for the box with { "color": "blue" } does not exist in context

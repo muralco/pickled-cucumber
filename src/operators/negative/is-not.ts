@@ -14,7 +14,6 @@ const op: Operator = {
     return errorPath !== undefined
       ? undefined
       : {
-        // TODO: here
         assertEquals: true,
         error: 'is',
         expected: expectedJson,

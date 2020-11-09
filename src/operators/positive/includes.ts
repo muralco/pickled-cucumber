@@ -1,5 +1,5 @@
-import { getDeep, recursiveMatch } from '../util';
-import { Operator } from './types';
+import { getDeep, recursiveMatch } from '../../util';
+import { Operator } from '../types';
 
 interface Offending {
   actual: unknown;
@@ -47,7 +47,6 @@ const findOffendingItem = (actual: unknown, expected: string): Offending => {
 const op: Operator = {
   arity: 'binary',
   description: `checks that the array or object 'a' contains the partial 'b'`,
-  error: '',
   exec: (actual, expected) => {
     const expectedJson = JSON.parse(expected);
     const offending = findOffendingItem(actual, expectedJson);

@@ -43,6 +43,7 @@ export const printError = ({
   full,
   path,
   subError,
+  unary,
 }: CompareError) => {
   const errorPath = subError ? subError.path : path;
   const at = errorPath
@@ -61,7 +62,9 @@ export const printError = ({
 
   const message = `
   Error${at}:
-    ${JSON.stringify(actualValue)} ${errorMessage} ${printValue(expectedValue)}
+    ${JSON.stringify(actualValue)} ${errorMessage}${
+      !unary ? ` ${printValue(expectedValue)}` : ''
+    }
   \n\n
   Actual${at}:
     ${prettyJson(actualValue, padd)}

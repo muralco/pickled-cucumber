@@ -1,13 +1,12 @@
-import { Operator } from './types';
+import { Operator } from '../types';
 
 const op: Operator = {
   arity: 'unary',
   description: `checks that 'a' is truthy`,
-  error: '',
   exec: actual =>
     actual
     ? undefined
-    : { error: 'is not truthy', expected: undefined },
+    : { error: 'is not truthy', unary: true },
   name: 'exists',
 };
 

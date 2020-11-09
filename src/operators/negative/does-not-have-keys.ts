@@ -1,9 +1,8 @@
-import { Operator } from './types';
+import { Operator } from '../types';
 
 const op: Operator = {
   arity: 'binary',
   description: `checks that the object 'a' has none of the keys in array 'b'`,
-  error: '',
   exec: (actual, notExpected) => {
     const actualObject = typeof actual === 'object'
       ? (actual as object)

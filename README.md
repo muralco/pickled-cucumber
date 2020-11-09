@@ -17,7 +17,7 @@ npm i pickled-cucumber
 const setup = require('pickled-cucumber').default; // note: `.default` here!
 
 const options = {
-  // opt-in into aliases, entities, documentaiton, etc.
+  // opt-in into aliases, entities, documentation, etc.
 };
 
 const fn = ({ Given, When, Then }) => {
@@ -61,7 +61,7 @@ The core module includes:
 ##### Variables and test context
 
 Variables are variables :). Variables have scenario scope (i.e. they are not
-shared acorss scenarios). This scenario scope is called the _context_. We'll
+shared across scenarios). This scenario scope is called the _context_. We'll
 cover how to manipulate the context in this section in a moment.
 
 As with regular variables in most programming languages there are two things you

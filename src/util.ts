@@ -94,10 +94,10 @@ export const getDeep = (o: unknown, path: string): unknown|undefined =>
     );
 
 export const stringToRegexp = (str: string): RegExp => {
-  const [flags] = (str.match(/\/([gimuy]+)$/) || []).slice(1);
+  const [flags] = (str.match(/\/([gimusy]+)$/) || []).slice(1);
 
   const expectedString = str
-    .replace(/^\/(.*)\/[gimuy]*$/, '$1')
+    .replace(/^\/(.*)\/[gimusy]*$/, '$1')
     .replace(/^"(.*)"$/, '$1');
 
   return new RegExp(expectedString, flags);

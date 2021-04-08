@@ -60,11 +60,12 @@ const setup = (fn: SetupFn, options: Options = {}) => {
 
   setDefaultTimeout(timeout || Number(process.env.TEST_TIMEOUT || '10') * 1000);
 
-  Before(() => {
+  Before($scenario => {
     const customCtx = options.initialContext && options.initialContext() || {};
     setCtx({
       random: Date.now(),
       ...customCtx,
+      $scenario,
       $tearDown: [],
     });
   });

@@ -1,13 +1,15 @@
 // This file is all about monkey patching CucumberJS to add pseudo-debugging
 // capabilities.
-import { messages } from '@cucumber/messages';
+import { Status } from '@cucumber/cucumber';
+import { IDefinition } from '@cucumber/cucumber/lib/models/definition';
 import  PickleRunner from '@cucumber/cucumber/lib/runtime/pickle_runner';
+import { messages } from '@cucumber/messages';
 import * as readline from 'readline';
 import { getCtx, getCtxItem } from '../context';
 import printSteps from '../steps/printer';
 import { Step as ContextStep } from '../steps/types';
-import { IDefinition } from '@cucumber/cucumber/lib/models/definition';
-import { Status } from '@cucumber/cucumber';
+import { getGherkinStepMap } from '@cucumber/cucumber/lib/formatter/helpers/gherkin_document_parser';
+import getColorFns from '@cucumber/cucumber/lib/formatter/get_color_fns';
 
 const oldRs = PickleRunner.prototype.invokeStep;
 
@@ -43,29 +45,41 @@ Hint 👊: you can use <Tab> completion!
 
 ${BAR}`;
 
+// Gets the uri and line of the file under test
+const extractStepData = (runner: PickleRunner, step: messages.Pickle.IPickleStep): {uri?: string | null, line?: string, text?: string} => {
+  // All the contorsion below is to be able to access the private gherkin document
+  const document = (runner as any).gherkinDocument as messages.IGherkinDocument;
+  const rawStep = getGherkinStepMap(document)[step.astNodeIds![0]];
+  return {
+    line: rawStep.location.line,
+    text: `${rawStep.keyword} ${step.text}`,
+    uri: document.uri,
+  }
+}
+
+const printLines = (...lines: string[]) => console.log(lines.join('\n'));
+
+// Get coloring functions
+const colorFns = getColorFns(true);
+
 const runAndPrintError = async (
   runner: PickleRunner,
-  steps: ContextStep[],
-  step: messages.Pickle.IPickleStep, 
-  def: IDefinition, 
-  hp?: any 
+  step: messages.Pickle.IPickleStep,
+  def: IDefinition,
+  hookParam?: any,
 ) => {
-  const r = await oldRs.call(runner, step, def, hp);
-  if (r.status === Status.FAILED) {
-    const actual = steps.find(s => s.name === step.text);
-
-    const stepText = actual
-      ? `${actual.kind} ${actual.name}`
-      : step.text;
-
-    const { uri, line } = def;
-    console.log(`\n> ${stepText} ${uri}:${line})`);
-    console.log(
-      `< ERROR:\n`,
-      r.message
+  const result = await oldRs.call(runner, step, def, hookParam);
+  if (result.status === Status.FAILED) {
+    const error = colorFns.forStatus(result.status);
+    const { line, text, uri} = extractStepData(runner, step);
+    printLines(
+      '',
+      `> ${text} (${uri}:${line})`,
+      error('< ERROR:'),
+      error(result.message!),
     );
   }
-  return r;
+  return result;
 };
 
 const completer = (steps: ContextStep[]) => {
@@ -110,7 +124,7 @@ const debug = (
       if (!newDef) {
         console.log('< ERROR: Unknown step!');
       } else {
-        const r = await runAndPrintError(runner, steps, newStep, newDef, hp);
+        const r = await runAndPrintError(runner, newStep, newDef, hp);
         if (r.status === Status.PASSED) {
           console.log('< OK');
         }
@@ -136,7 +150,7 @@ const debug = (
         break;
       case 'r':
       case 'retry':
-        const r = await runAndPrintError(runner, steps, step, def, hp);
+        const r = await runAndPrintError(runner, step, def, hp);
         if (r.status !== Status.FAILED) {
           actualResult = r;
           rl.close();
@@ -166,7 +180,7 @@ export default (steps: ContextStep[]) => {
     hp,
   ) {
     // tslint:disable-next-line:no-invalid-this
-    const r = await runAndPrintError(this, steps, step, def, hp);
+    const r = await runAndPrintError(this, step, def, hp);
     if (r.status !== Status.FAILED) {
       return r;
     }

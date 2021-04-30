@@ -51,19 +51,15 @@ const runAndPrintError = async (
   hp?: any 
 ) => {
   const r = await oldRs.call(runner, step, def, hp);
-  if (r.status === Status.UNKNOWN) {
+  if (r.status === Status.FAILED) {
     const actual = steps.find(s => s.name === step.text);
 
     const stepText = actual
       ? `${actual.kind} ${actual.name}`
       : step.text;
 
-    /*
-    const { uri } = runner.testCaseSourceLocation;
-    const { line } = runner.testCase.pickle.steps[runner.testStepIndex - 1]
-      .locations[0];
-    */
-    console.log(`\n> ${stepText}`) // (${uri}:${line})`);
+    const { uri, line } = def;
+    console.log(`\n> ${stepText} ${uri}:${line})`);
     console.log(
       `< ERROR:\n`,
       r.message

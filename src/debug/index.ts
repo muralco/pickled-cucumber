@@ -1,6 +1,10 @@
 // This file is all about monkey patching CucumberJS to add pseudo-debugging
 // capabilities.
 import { Status } from '@cucumber/cucumber';
+import getColorFns from '@cucumber/cucumber/lib/formatter/get_color_fns';
+import {
+  getGherkinStepMap,
+} from '@cucumber/cucumber/lib/formatter/helpers/gherkin_document_parser';
 import { IDefinition } from '@cucumber/cucumber/lib/models/definition';
 import  PickleRunner from '@cucumber/cucumber/lib/runtime/pickle_runner';
 import { messages } from '@cucumber/messages';
@@ -8,8 +12,6 @@ import * as readline from 'readline';
 import { getCtx, getCtxItem } from '../context';
 import printSteps from '../steps/printer';
 import { Step as ContextStep } from '../steps/types';
-import { getGherkinStepMap } from '@cucumber/cucumber/lib/formatter/helpers/gherkin_document_parser';
-import getColorFns from '@cucumber/cucumber/lib/formatter/get_color_fns';
 
 const oldRs = PickleRunner.prototype.invokeStep;
 
@@ -45,17 +47,28 @@ Hint 👊: you can use <Tab> completion!
 
 ${BAR}`;
 
+interface StepData {
+  uri?: string | null;
+  line?: string;
+  text?: string;
+}
+
 // Gets the uri and line of the file under test
-const extractStepData = (runner: PickleRunner, step: messages.Pickle.IPickleStep): {uri?: string | null, line?: string, text?: string} => {
-  // All the contorsion below is to be able to access the private gherkin document
-  const document = (runner as any).gherkinDocument as messages.IGherkinDocument;
+const extractStepData = (
+  runner: PickleRunner,
+  step: messages.Pickle.IPickleStep,
+): StepData => {
+  // All the contorsion below is to be able to access the private gherkin doc
+  const document = (
+    runner as any
+  ).gherkinDocument as messages.IGherkinDocument;
   const rawStep = getGherkinStepMap(document)[step.astNodeIds![0]];
   return {
     line: rawStep.location.line,
     text: `${rawStep.keyword} ${step.text}`,
     uri: document.uri,
-  }
-}
+  };
+};
 
 const printLines = (...lines: string[]) => console.log(lines.join('\n'));
 
@@ -71,7 +84,7 @@ const runAndPrintError = async (
   const result = await oldRs.call(runner, step, def, hookParam);
   if (result.status === Status.FAILED) {
     const error = colorFns.forStatus(result.status);
-    const { line, text, uri} = extractStepData(runner, step);
+    const { line, text, uri } = extractStepData(runner, step);
     printLines(
       '',
       `> ${text} (${uri}:${line})`,

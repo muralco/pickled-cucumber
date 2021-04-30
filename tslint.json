@@ -3,7 +3,7 @@
   "rules": {
     "arrow-return-shorthand": true,
     "import-name": false,
-    "max-line-length": [true, 80],
+    "max-line-length": [true, 89],
     "member-ordering": [
       true,
       {

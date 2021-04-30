@@ -15,8 +15,11 @@
   },
   "homepage": "https://github.com/muralco/pickled-cucumber",
   "devDependencies": {
+    "@types/lodash": "4.14.168",
     "@types/node": "^12.12.14",
     "@types/node-fetch": "^2.1.2",
+    "@types/progress": "2.0.3",
+    "durations": "3.4.2",
     "ts-unused-exports": "^2.0.10",
     "tslint": "^5.11.0",
     "tslint-config-airbnb": "^5.9.2",

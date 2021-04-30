@@ -49,8 +49,8 @@ ${BAR}`;
 
 interface StepData {
   uri?: string | null;
-  line?: string;
-  text?: string;
+  line?: number | null;
+  text?: string | null;
 }
 
 // Gets the uri and line of the file under test
@@ -64,7 +64,7 @@ const extractStepData = (
   ).gherkinDocument as messages.IGherkinDocument;
   const rawStep = getGherkinStepMap(document)[step.astNodeIds![0]];
   return {
-    line: rawStep.location.line,
+    line: rawStep.location?.line,
     text: `${rawStep.keyword} ${step.text}`,
     uri: document.uri,
   };

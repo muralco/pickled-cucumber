@@ -15,7 +15,6 @@
   },
   "homepage": "https://github.com/muralco/pickled-cucumber",
   "devDependencies": {
-    "@types/cucumber": "^4.0.7",
     "@types/node": "^12.12.14",
     "@types/node-fetch": "^2.1.2",
     "ts-unused-exports": "^2.0.10",
@@ -24,7 +23,7 @@
     "typescript": "^3.7.3"
   },
   "dependencies": {
-    "cucumber": "^4.2.1",
+    "@cucumber/cucumber": "7.2.1",
     "node-fetch": "^2.2.0",
     "ts-node": "^7.0.0"
   },

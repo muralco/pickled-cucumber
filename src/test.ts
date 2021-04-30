@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { AfterAll } from 'cucumber';
+import { AfterAll } from '@cucumber/cucumber';
 import nodeFetch from 'node-fetch';
 import { promisify } from 'util';
 import compareJson from './compare-json';

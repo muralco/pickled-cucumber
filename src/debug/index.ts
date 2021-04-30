@@ -1,17 +1,15 @@
 // This file is all about monkey patching CucumberJS to add pseudo-debugging
 // capabilities.
-import TestCaseRunner, {
-  HookParams,
-  Result,
-  Step,
-  StepDefinition,
-} from 'cucumber/lib/runtime/test_case_runner';
+import { messages } from '@cucumber/messages';
+import  PickleRunner from '@cucumber/cucumber/lib/runtime/pickle_runner';
 import * as readline from 'readline';
 import { getCtx, getCtxItem } from '../context';
 import printSteps from '../steps/printer';
 import { Step as ContextStep } from '../steps/types';
+import { IDefinition } from '@cucumber/cucumber/lib/models/definition';
+import { Status } from '@cucumber/cucumber';
 
-const oldRs = TestCaseRunner.prototype.invokeStep;
+const oldRs = PickleRunner.prototype.invokeStep;
 
 const COMMANDS = [
   'dump',
@@ -46,29 +44,29 @@ Hint 👊: you can use <Tab> completion!
 ${BAR}`;
 
 const runAndPrintError = async (
-  runner: TestCaseRunner,
+  runner: PickleRunner,
   steps: ContextStep[],
-  step: Step,
-  def: StepDefinition,
-  hp: HookParams | undefined,
+  step: messages.Pickle.IPickleStep, 
+  def: IDefinition, 
+  hp?: any 
 ) => {
   const r = await oldRs.call(runner, step, def, hp);
-  if (r.status === 'failed') {
+  if (r.status === Status.UNKNOWN) {
     const actual = steps.find(s => s.name === step.text);
 
     const stepText = actual
       ? `${actual.kind} ${actual.name}`
       : step.text;
 
+    /*
     const { uri } = runner.testCaseSourceLocation;
     const { line } = runner.testCase.pickle.steps[runner.testStepIndex - 1]
       .locations[0];
-    console.log(`\n> ${stepText} (${uri}:${line})`);
+    */
+    console.log(`\n> ${stepText}`) // (${uri}:${line})`);
     console.log(
       `< ERROR:\n`,
-      r.exception
-        ? r.exception.toString()
-        : r.exception,
+      r.message
     );
   }
   return r;
@@ -89,13 +87,13 @@ const completer = (steps: ContextStep[]) => {
 };
 
 const debug = (
-  runner: TestCaseRunner,
+  runner: PickleRunner,
   steps: ContextStep[],
-  step: Step,
-  def: StepDefinition,
-  hp: HookParams | undefined,
-  result: Result,
-): Promise<Result> => new Promise((resolve) => {
+  step: messages.Pickle.IPickleStep,
+  def: IDefinition,
+  hp: any | undefined,
+  result: messages.TestStepFinished.ITestStepResult,
+): Promise<messages.TestStepFinished.ITestStepResult> => new Promise((resolve) => {
   let actualResult = result;
 
   const rl = readline.createInterface({
@@ -117,7 +115,7 @@ const debug = (
         console.log('< ERROR: Unknown step!');
       } else {
         const r = await runAndPrintError(runner, steps, newStep, newDef, hp);
-        if (r.status === 'passed') {
+        if (r.status === Status.PASSED) {
           console.log('< OK');
         }
       }
@@ -143,7 +141,7 @@ const debug = (
       case 'r':
       case 'retry':
         const r = await runAndPrintError(runner, steps, step, def, hp);
-        if (r.status !== 'failed') {
+        if (r.status !== Status.FAILED) {
           actualResult = r;
           rl.close();
           return;
@@ -166,14 +164,14 @@ const debug = (
 });
 
 export default (steps: ContextStep[]) => {
-  TestCaseRunner.prototype.invokeStep = async function debugInvokeStep(
+  PickleRunner.prototype.invokeStep = async function debugInvokeStep(
     step,
     def,
     hp,
   ) {
     // tslint:disable-next-line:no-invalid-this
     const r = await runAndPrintError(this, steps, step, def, hp);
-    if (r.status !== 'failed') {
+    if (r.status !== Status.FAILED) {
       return r;
     }
 

@@ -7,7 +7,7 @@ import {
   setDefaultTimeout,
   Then,
   When,
-} from 'cucumber';
+} from '@cucumber/cucumber';
 import printAliases from './aliases/printer';
 import compareJson from './compare-json';
 import { getCtx, getCtxItem, pushCtxItem, setCtx, setCtxItem } from './context';

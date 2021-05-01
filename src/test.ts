@@ -1,5 +1,5 @@
-import { AfterAll } from '@cucumber/cucumber';
-import * as assert from 'assert';
+import { AfterAll, supportCodeLibraryBuilder } from '@cucumber/cucumber';
+import assert from 'assert';
 import nodeFetch from 'node-fetch';
 import { promisify } from 'util';
 import compareJson from './compare-json';
@@ -189,7 +189,7 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
 
 };
 
-setup(fn, options);
+setup(supportCodeLibraryBuilder.methods, fn, options);
 
 // === Test `getVariables` ================================================== //
 assert.deepEqual(getVariables('A'), ['A']);

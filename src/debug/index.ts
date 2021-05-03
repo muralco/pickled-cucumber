@@ -6,14 +6,16 @@ import {
   getGherkinStepMap,
 } from '@cucumber/cucumber/lib/formatter/helpers/gherkin_document_parser';
 import { IDefinition } from '@cucumber/cucumber/lib/models/definition';
-import  PickleRunner from '@cucumber/cucumber/lib/runtime/pickle_runner';
+// Imported just for type checking
+import PickleRunner from '@cucumber/cucumber/lib/runtime/pickle_runner';
 import { messages } from '@cucumber/messages';
 import * as readline from 'readline';
 import { getCtx, getCtxItem } from '../context';
+import { HostPickleRunner } from '../cucumber-host';
 import printSteps from '../steps/printer';
 import { Step as ContextStep } from '../steps/types';
 
-const oldRs = PickleRunner.prototype.invokeStep;
+const oldRs = HostPickleRunner.prototype.invokeStep;
 
 const COMMANDS = [
   'dump',
@@ -187,7 +189,7 @@ const debug = (
 });
 
 export default (steps: ContextStep[]) => {
-  PickleRunner.prototype.invokeStep = async function debugInvokeStep(
+  HostPickleRunner.prototype.invokeStep = async function debugInvokeStep(
     step,
     def,
     hp,

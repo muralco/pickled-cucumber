@@ -1,10 +1,10 @@
-import {
-  IDefineSupportCodeMethods,
-} from '@cucumber/cucumber/lib/support_code_library_builder/types';
-import importCwd from 'import-cwd';
 import printAliases from './aliases/printer';
 import compareJson from './compare-json';
 import { getCtx, getCtxItem, pushCtxItem, setCtx, setCtxItem } from './context';
+import {
+    After, AfterAll, Before, BeforeAll,
+    Given, setDefaultTimeout, Then, When,
+} from './cucumber-host';
 import setupDebug from './debug';
 import setupEntities from './entities';
 import { defineElasticSteps } from './entities/elasticsearch';
@@ -23,19 +23,6 @@ import {
   StepDefinitionFn,
   TearDownFn,
 } from './types';
-
-/**
- * Import host project cucumber
- *
- * This is required to register the steps on the right cucumber instance.
- *
- * Cucumber holds a lot of state on modules (seems they are using them as singletons)
- * https://git.io/J3EF8
- */
-const {
-    After, AfterAll, Before, BeforeAll,
-    Given, setDefaultTimeout, Then, When,
-} = importCwd('@cucumber/cucumber') as IDefineSupportCodeMethods;
 
 export { getVariables } from './aliases';
 

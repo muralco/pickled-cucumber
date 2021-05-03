@@ -18,6 +18,5 @@
   },
   "include": [
       "./src/**/*.ts",
-      "./node_modules/@cucumber/cucumber/**/*.d.ts"
   ]
 }

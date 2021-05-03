@@ -1,6 +1,7 @@
 import {
   IDefineSupportCodeMethods,
 } from '@cucumber/cucumber/lib/support_code_library_builder/types';
+import importCwd from 'import-cwd';
 import printAliases from './aliases/printer';
 import compareJson from './compare-json';
 import { getCtx, getCtxItem, pushCtxItem, setCtx, setCtxItem } from './context';
@@ -23,6 +24,19 @@ import {
   TearDownFn,
 } from './types';
 
+/**
+ * Import host project cucumber
+ *
+ * This is required to register the steps on the right cucumber instance.
+ *
+ * Cucumber holds a lot of state on modules (seems they are using them as singletons)
+ * https://git.io/J3EF8
+ */
+const {
+    After, AfterAll, Before, BeforeAll,
+    Given, setDefaultTimeout, Then, When,
+} = importCwd('@cucumber/cucumber') as IDefineSupportCodeMethods;
+
 export { getVariables } from './aliases';
 
 export type Options = BaseOptions;
@@ -30,14 +44,9 @@ export type Options = BaseOptions;
 export type SetupFn = (args: SetupFnArgs) => void;
 
 const setup = (
-  cucumberModule: IDefineSupportCodeMethods,
   fn: SetupFn,
   options: Options = {},
 ) => {
-  const {
-    After, AfterAll, Before, BeforeAll,
-    Given, setDefaultTimeout, Then, When,
-  } = cucumberModule;
   // Force unhandleded promise rejections to fail (warning => error)
   process.on('unhandledRejection', (up: unknown) => { throw up; });
   // Tear down

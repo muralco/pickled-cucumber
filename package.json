@@ -27,8 +27,12 @@
   },
   "dependencies": {
     "@cucumber/cucumber": "7.2.1",
+    "import-cwd": "3.0.0",
     "node-fetch": "^2.2.0",
     "ts-node": "^7.0.0"
+  },
+  "peerDependencies": {
+    "@cucumber/cucumber": "7.2.1"
   },
   "scripts": {
     "build": "npm run lint && tsc",

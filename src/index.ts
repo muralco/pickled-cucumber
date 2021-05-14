@@ -1,13 +1,7 @@
 import {
-  After,
-  AfterAll,
-  Before,
-  BeforeAll,
-  Given,
-  setDefaultTimeout,
-  Then,
-  When,
-} from 'cucumber';
+    After, AfterAll, Before, BeforeAll,
+    Given, setDefaultTimeout, Then, When,
+} from '@cucumber/cucumber';
 import printAliases from './aliases/printer';
 import compareJson from './compare-json';
 import { getCtx, getCtxItem, pushCtxItem, setCtx, setCtxItem } from './context';
@@ -36,15 +30,17 @@ export type Options = BaseOptions;
 
 export type SetupFn = (args: SetupFnArgs) => void;
 
-// Tear down
-const getTearDown = () => getCtxItem<TearDownFn[]>('$tearDown');
-if (!process.env.KEEP_DATA) {
-  After(() => Promise.all(getTearDown().reverse().map(fn => fn())));
-}
-
-const setup = (fn: SetupFn, options: Options = {}) => {
+const setup = (
+  fn: SetupFn,
+  options: Options = {},
+) => {
   // Force unhandleded promise rejections to fail (warning => error)
   process.on('unhandledRejection', (up: unknown) => { throw up; });
+  // Tear down
+  const getTearDown = () => getCtxItem<TearDownFn[]>('$tearDown');
+  if (!process.env.KEEP_DATA) {
+    After(() => Promise.all(getTearDown().reverse().map(fn => fn())));
+  }
 
   const {
     aliases = {},

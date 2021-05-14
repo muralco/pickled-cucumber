@@ -498,3 +498,7 @@ TBD
 ### `require` mocks
 
 TBD
+
+## Development
+To test your local copy run `npm run pack` and install the package like this:
+`npm install ../pickled-cucumber/dist/pickled-cucumber-<version>.tgz`

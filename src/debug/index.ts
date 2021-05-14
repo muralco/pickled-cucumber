@@ -1,17 +1,20 @@
 // This file is all about monkey patching CucumberJS to add pseudo-debugging
 // capabilities.
-import TestCaseRunner, {
-  HookParams,
-  Result,
-  Step,
-  StepDefinition,
-} from 'cucumber/lib/runtime/test_case_runner';
+import { Status } from '@cucumber/cucumber';
+import getColorFns from '@cucumber/cucumber/lib/formatter/get_color_fns';
+import {
+  getGherkinStepMap,
+} from '@cucumber/cucumber/lib/formatter/helpers/gherkin_document_parser';
+import { IDefinition } from '@cucumber/cucumber/lib/models/definition';
+// Imported just for type checking
+import PickleRunner from '@cucumber/cucumber/lib/runtime/pickle_runner';
+import { messages } from '@cucumber/messages';
 import * as readline from 'readline';
 import { getCtx, getCtxItem } from '../context';
 import printSteps from '../steps/printer';
 import { Step as ContextStep } from '../steps/types';
 
-const oldRs = TestCaseRunner.prototype.invokeStep;
+const oldRs = PickleRunner.prototype.invokeStep;
 
 const COMMANDS = [
   'dump',
@@ -45,33 +48,52 @@ Hint 👊: you can use <Tab> completion!
 
 ${BAR}`;
 
+interface StepData {
+  uri?: string | null;
+  line?: number | null;
+  text?: string | null;
+}
+
+// Gets the uri and line of the file under test
+const extractStepData = (
+  runner: PickleRunner,
+  step: messages.Pickle.IPickleStep,
+): StepData => {
+  // All the contorsion below is to be able to access the private gherkin doc
+  const document = (
+    runner as any
+  ).gherkinDocument as messages.IGherkinDocument;
+  const rawStep = getGherkinStepMap(document)[step.astNodeIds![0]];
+  return {
+    line: rawStep.location?.line,
+    text: `${rawStep.keyword} ${step.text}`,
+    uri: document.uri,
+  };
+};
+
+const printLines = (...lines: string[]) => console.log(lines.join('\n'));
+
+// Get coloring functions
+const colorFns = getColorFns(true);
+
 const runAndPrintError = async (
-  runner: TestCaseRunner,
-  steps: ContextStep[],
-  step: Step,
-  def: StepDefinition,
-  hp: HookParams | undefined,
+  runner: PickleRunner,
+  step: messages.Pickle.IPickleStep,
+  def: IDefinition,
+  hookParam?: any,
 ) => {
-  const r = await oldRs.call(runner, step, def, hp);
-  if (r.status === 'failed') {
-    const actual = steps.find(s => s.name === step.text);
-
-    const stepText = actual
-      ? `${actual.kind} ${actual.name}`
-      : step.text;
-
-    const { uri } = runner.testCaseSourceLocation;
-    const { line } = runner.testCase.pickle.steps[runner.testStepIndex - 1]
-      .locations[0];
-    console.log(`\n> ${stepText} (${uri}:${line})`);
-    console.log(
-      `< ERROR:\n`,
-      r.exception
-        ? r.exception.toString()
-        : r.exception,
+  const result = await oldRs.call(runner, step, def, hookParam);
+  if (result.status === Status.FAILED) {
+    const error = colorFns.forStatus(result.status);
+    const { line, text, uri } = extractStepData(runner, step);
+    printLines(
+      '',
+      `> ${text} (${uri}:${line})`,
+      error('< ERROR:'),
+      error(result.message!),
     );
   }
-  return r;
+  return result;
 };
 
 const completer = (steps: ContextStep[]) => {
@@ -89,13 +111,13 @@ const completer = (steps: ContextStep[]) => {
 };
 
 const debug = (
-  runner: TestCaseRunner,
+  runner: PickleRunner,
   steps: ContextStep[],
-  step: Step,
-  def: StepDefinition,
-  hp: HookParams | undefined,
-  result: Result,
-): Promise<Result> => new Promise((resolve) => {
+  step: messages.Pickle.IPickleStep,
+  def: IDefinition,
+  hp: any | undefined,
+  result: messages.TestStepFinished.ITestStepResult,
+): Promise<messages.TestStepFinished.ITestStepResult> => new Promise((resolve) => {
   let actualResult = result;
 
   const rl = readline.createInterface({
@@ -116,8 +138,8 @@ const debug = (
       if (!newDef) {
         console.log('< ERROR: Unknown step!');
       } else {
-        const r = await runAndPrintError(runner, steps, newStep, newDef, hp);
-        if (r.status === 'passed') {
+        const r = await runAndPrintError(runner, newStep, newDef, hp);
+        if (r.status === Status.PASSED) {
           console.log('< OK');
         }
       }
@@ -142,8 +164,8 @@ const debug = (
         break;
       case 'r':
       case 'retry':
-        const r = await runAndPrintError(runner, steps, step, def, hp);
-        if (r.status !== 'failed') {
+        const r = await runAndPrintError(runner, step, def, hp);
+        if (r.status !== Status.FAILED) {
           actualResult = r;
           rl.close();
           return;
@@ -166,14 +188,14 @@ const debug = (
 });
 
 export default (steps: ContextStep[]) => {
-  TestCaseRunner.prototype.invokeStep = async function debugInvokeStep(
+  PickleRunner.prototype.invokeStep = async function debugInvokeStep(
     step,
     def,
     hp,
   ) {
     // tslint:disable-next-line:no-invalid-this
-    const r = await runAndPrintError(this, steps, step, def, hp);
-    if (r.status !== 'failed') {
+    const r = await runAndPrintError(this, step, def, hp);
+    if (r.status !== Status.FAILED) {
       return r;
     }
 

@@ -1,10 +1,10 @@
-import printAliases from './aliases/printer';
-import compareJson from './compare-json';
-import { getCtx, getCtxItem, pushCtxItem, setCtx, setCtxItem } from './context';
 import {
     After, AfterAll, Before, BeforeAll,
     Given, setDefaultTimeout, Then, When,
-} from './cucumber-host';
+} from '@cucumber/cucumber';
+import printAliases from './aliases/printer';
+import compareJson from './compare-json';
+import { getCtx, getCtxItem, pushCtxItem, setCtx, setCtxItem } from './context';
 import setupDebug from './debug';
 import setupEntities from './entities';
 import { defineElasticSteps } from './entities/elasticsearch';

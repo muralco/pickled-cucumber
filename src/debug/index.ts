@@ -11,11 +11,10 @@ import PickleRunner from '@cucumber/cucumber/lib/runtime/pickle_runner';
 import { messages } from '@cucumber/messages';
 import * as readline from 'readline';
 import { getCtx, getCtxItem } from '../context';
-import { HostPickleRunner } from '../cucumber-host';
 import printSteps from '../steps/printer';
 import { Step as ContextStep } from '../steps/types';
 
-const oldRs = HostPickleRunner.prototype.invokeStep;
+const oldRs = PickleRunner.prototype.invokeStep;
 
 const COMMANDS = [
   'dump',
@@ -189,7 +188,7 @@ const debug = (
 });
 
 export default (steps: ContextStep[]) => {
-  HostPickleRunner.prototype.invokeStep = async function debugInvokeStep(
+  PickleRunner.prototype.invokeStep = async function debugInvokeStep(
     step,
     def,
     hp,

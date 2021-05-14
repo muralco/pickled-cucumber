@@ -20,6 +20,7 @@
     "@types/node-fetch": "^2.1.2",
     "@types/progress": "2.0.3",
     "durations": "3.4.2",
+    "execa": "5.0.0",
     "ts-unused-exports": "^7.0.3",
     "tslint": "^5.11.0",
     "tslint-config-airbnb": "^5.9.2",

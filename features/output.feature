@@ -31,9 +31,9 @@ Scenario: Capture and suppression disabled
   """
   logged-on-initial-context-stdout
   .Hello world
-  .....logged-on-initial-context-stdout
+  ....logged-on-initial-context-stdout
   .Hello world
-  ..F..
+  ..F.
 
   Failures:
 

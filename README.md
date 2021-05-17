@@ -1,5 +1,7 @@
 Pickled cucumber
 ===============
+[![npm version](https://badge.fury.io/js/pickled-cucumber.svg)](https://badge.fury.io/js/pickled-cucumber)
+[![Build Status](https://travis-ci.com/muralco/pickled-cucumber.svg?branch=master)](https://travis-ci.com/muralco/pickled-cucumber)
 
 ## Description
 

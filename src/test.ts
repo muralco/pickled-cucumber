@@ -1,6 +1,8 @@
 import { AfterAll } from '@cucumber/cucumber';
 import assert from 'assert';
+import execa from 'execa';
 import nodeFetch from 'node-fetch';
+import path from 'path';
 import { promisify } from 'util';
 import compareJson from './compare-json';
 import createElasticEntity from './entities/elasticsearch';
@@ -12,6 +14,8 @@ import httpSupertest from './http/supertest';
 import setup, { getVariables, Options, SetupFn } from './index';
 import { CompareError } from './operators/types';
 
+const { mkdtemp, rmdir, writeFile } = require('fs').promises;
+
 let initialTen = 10;
 const ELASTIC_URI = process.env.ELASTIC_URI
   ? `${process.env.ELASTIC_URI}/test-index`
@@ -20,9 +24,12 @@ const ELASTIC_URI = process.env.ELASTIC_URI
 // === Test `entities` ====================================================== //
 const entities: EntityMap = {};
 
-interface Box { id: number; color: string; }
+interface Box {
+  id: number;
+  color: string;
+}
 let boxId = 0;
-entities['box'] = createMemoryEntity<Box, 'id'>('id', () => boxId += 1);
+entities['box'] = createMemoryEntity<Box, 'id'>('id', () => (boxId += 1));
 
 // === Test `entities/mongo` ================================================ //
 if (process.env.MONGO_URI) {
@@ -33,9 +40,7 @@ if (process.env.MONGO_URI) {
   const getDb = async () => {
     if (client) return client;
 
-    client = promisify(mongo.MongoClient.connect)(
-      process.env.MONGO_URI,
-    );
+    client = promisify(mongo.MongoClient.connect)(process.env.MONGO_URI);
 
     await client;
     connected = true;
@@ -53,14 +58,10 @@ if (process.env.MONGO_URI) {
 
 // === Test `entities/elasticsearch` ======================================== //
 if (ELASTIC_URI) {
-  entities['search'] = createElasticEntity(
-    ELASTIC_URI,
-    '/test-type',
-    'id', {
-      onCreate: attrs => ({ id: Date.now(), ...attrs, created: Date.now() }),
-      onUpdate: attrs => ({ ...attrs, updated: Date.now() }),
-    },
-  );
+  entities['search'] = createElasticEntity(ELASTIC_URI, '/test-type', 'id', {
+    onCreate: attrs => ({ id: Date.now(), ...attrs, created: Date.now() }),
+    onUpdate: attrs => ({ ...attrs, updated: Date.now() }),
+  });
 }
 
 // ========================================================================== //
@@ -69,6 +70,7 @@ const options: Options = {
     '/api/*': /\/api\/.*/,
     'proper-name': /[A-Z][a-z]*/,
   },
+  captureOutput: true,
   elasticSearchIndexUri: ELASTIC_URI,
   entities,
   http: httpFetch(nodeFetch),
@@ -83,6 +85,7 @@ const options: Options = {
   requireMocks: {
     'totally-random-module': 42,
   },
+  suppressOutput: true,
   usage: true,
 };
 
@@ -97,40 +100,30 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
   // === Test `compareJson` and `aliases` =================================== //
   const getResult = () => getCtx<CompareError>('$result');
 
-  Given(
-    '{word} is',
-    (name, value) => setCtx(name, JSON.parse(value)),
-    { inline: true },
-  );
+  Given('{word} is', (name, value) => setCtx(name, JSON.parse(value)), {
+    inline: true,
+  });
 
   When(
     'asserting that {word} {op}',
-    (varName, op, expected) => setCtx(
-      '$result',
-      compareJson({}, op, getCtx(varName), expected),
-    ),
+    (varName, op, expected) =>
+      setCtx('$result', compareJson({}, op, getCtx(varName), expected)),
     { inline: true },
   );
 
-  Then(
-    'the assertion passes',
-    () => assert.equal(getResult(), undefined),
-  );
-  Then(
-    'the assertion fails with {any}',
-    (expected) => {
-      const r = getResult();
-      assert(r, 'the assertion passed');
-      assert.deepEqual(
-        `${JSON.stringify(r.actual)} ${r.error}${
-          !r.unary ? ` ${JSON.stringify(r.expected)}` : ''
-        }`,
-        expected,
-      );
-    });
-  Then(
-    'the error path is {any}',
-    path => assert.equal(JSON.stringify(getResult().path), path),
+  Then('the assertion passes', () => assert.equal(getResult(), undefined));
+  Then('the assertion fails with {any}', (expected) => {
+    const r = getResult();
+    assert(r, 'the assertion passed');
+    assert.deepEqual(
+      `${JSON.stringify(r.actual)} ${r.error}${
+        !r.unary ? ` ${JSON.stringify(r.expected)}` : ''
+      }`,
+      expected,
+    );
+  });
+  Then('the error path is {any}', path =>
+    assert.equal(JSON.stringify(getResult().path), path),
   );
   Then(
     'the full actual value is',
@@ -149,44 +142,128 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
       }
     },
   );
-  Then(
-    'A proper name can be {proper-name}',
-    name => assert(!!name.match(/^[A-Z]/)),
+  Then('A proper name can be {proper-name}', name =>
+    assert(!!name.match(/^[A-Z]/)),
   );
-  Then(
-    'the {/api/*} alias matches (.*)',
-    (actual, expected) => assert.equal(actual, expected),
+  Then('the {/api/*} alias matches (.*)', (actual, expected) =>
+    assert.equal(actual, expected),
   );
 
   // === Test `initialContext` ============================================== //
-  When(
-    'incrementing the value of {variable}',
-    name => setCtx(name, getCtx<number>(name) + 1),
+  When('incrementing the value of {variable}', name =>
+    setCtx(name, getCtx<number>(name) + 1),
   );
-  Then(
-    'the value of {variable} is {int}',
-    (name, val) => assert.equal(getCtx<number>(name), parseInt(val, 10)),
+  Then('the value of {variable} is {int}', (name, val) =>
+    assert.equal(getCtx<number>(name), parseInt(val, 10)),
   );
 
   // === Test `onTearDown` ================================================== //
-  When(
-    'incrementing the value of the global initialTen',
-    () => {
-      initialTen += 1;
-      onTearDown(() => { initialTen -= 1; });
-    },
-  );
-  Then(
-    'the value of the global initialTen is {int}',
-    val => assert.equal(initialTen, parseInt(val, 10)),
+  When('incrementing the value of the global initialTen', () => {
+    initialTen += 1;
+    onTearDown(() => {
+      initialTen -= 1;
+    });
+  });
+  Then('the value of the global initialTen is {int}', val =>
+    assert.equal(initialTen, parseInt(val, 10)),
   );
 
   // === Test expansion ===================================================== //
-  Then(
-    'variable {variable} has value (.*)',
-    (name, val) => assert.equal(getCtx(name), val),
+  Then('variable {variable} has value (.*)', (name, val) =>
+    assert.equal(getCtx(name), val),
   );
 
+  // === Test output ======================================================== //
+  Given('step definition', payload => setCtx('steps-definition', payload));
+  Given('feature file is', payload =>
+    setCtx(`feature-file-content`, payload),
+  );
+  Given('stdio output is suppressed', () =>
+    setCtx(`suppression-enabled`, true),
+  );
+  Given('stdio output is captured', () => setCtx(`capture-enabled`, true));
+  Given('debug module is enabled', () => setCtx(`debug-enabled`, true));
+  When('the suite is executed', async () => {
+    const testDir = await mkdtemp(`output-test-`);
+    const featureFile = path.join(testDir, 'test-feature.feature');
+    const stepsFile = path.join(testDir, 'steps.ts');
+
+    await writeFile(featureFile, getCtx('feature-file-content'));
+
+    const testOptions: Options = {
+      captureOutput: getCtx<boolean | undefined>('capture-enabled'),
+      debug: getCtx<boolean | undefined>('debug-enabled'),
+      suppressOutput: getCtx<boolean | undefined>('suppression-enabled'),
+    };
+
+    // Asume they define fn
+    const stepsContent = `
+import setup, { SetupFn } from '../src/index';
+
+${getCtx('steps-definition')}
+
+setup(fn, ${JSON.stringify(testOptions)});
+    `;
+
+    await writeFile(stepsFile, stepsContent);
+
+    try {
+      const output = await execa(
+        './node_modules/.bin/cucumber-js',
+        [
+          '--publish-quiet',
+          '--require-module',
+          'ts-node/register',
+          '-r',
+          stepsFile,
+          featureFile,
+        ],
+        {
+          env: {
+            TS_NODE_CACHE: 'false',
+            TS_NODE_FILES: 'true',
+          },
+        },
+      );
+      setCtx('test-suite-stdout', output.stdout);
+      setCtx('test-suite-stderr', output.stderr);
+    } catch (error) {
+      // Test suite can fail
+      setCtx('test-suite-stdout', error.stdout);
+      setCtx('test-suite-stderr', error.stderr);
+    }
+
+    onTearDown(async () => {
+      if (testDir) {
+        await rmdir(testDir, { recursive: true });
+      }
+    });
+  });
+  Then('stdout contains', (payload) => {
+    const output = getCtx<string>('test-suite-stdout');
+    // Remove last line (used to report status because has timings)
+    const filtered = output
+      .split('\n')
+      .map(line => line.split(' #')[0])
+      .filter((line) => {
+        // Remove last line (used to report status because has timings)
+        if (line.includes('s (executing steps: ')) {
+          return false;
+        }
+        // Remove information from exceptions
+        if (line.startsWith('           at ')) {
+          return false;
+        }
+        return true;
+      })
+      .join('\n');
+
+    assert.deepEqual(filtered, payload);
+  });
+  Then('stderr contains', (payload) => {
+    const output = getCtx<string>('test-suite-stderr');
+    assert.deepEqual(output, payload);
+  });
 };
 
 setup(fn, options);

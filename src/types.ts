@@ -17,13 +17,15 @@ export interface RequireMockMap {
 
 export interface Options {
   aliases?: Aliases;
+  captureOutput?: boolean;
   debug?: boolean;
   elasticSearchIndexUri?: string;
   entities?: EntityMap;
-  initialContext?: () => Context;
   http?: HttpFn;
+  initialContext?: () => Context;
   operators?: OperatorMap;
   requireMocks?: RequireMockMap;
+  suppressOutput?: boolean;
   timeout?: number;
   usage?: boolean;
 }

@@ -12,6 +12,7 @@ import setupHttp from './http';
 import setupMisc from './misc';
 import { getOpSpec } from './operators';
 import printOperators, { printError } from './operators/printer';
+import { setupOutputCapture } from './output';
 import setupRequireMock from './require';
 import stepCtor from './steps/constructor';
 import printSteps from './steps/printer';
@@ -44,12 +45,14 @@ const setup = (
 
   const {
     aliases = {},
+    captureOutput,
     debug,
     elasticSearchIndexUri,
     entities = {},
     http,
     operators = {},
     requireMocks,
+    suppressOutput,
     timeout,
     usage,
   } = options;
@@ -109,7 +112,9 @@ const setup = (
   if (hasEntities) setupEntities(entities, args);
   if (elasticSearchIndexUri) defineElasticSteps(elasticSearchIndexUri, args);
   if (http) setupHttp(http, args);
-
+  if (!debug && (captureOutput || suppressOutput)) {
+    setupOutputCapture(captureOutput, suppressOutput);
+  }
   fn(args);
 
   if (usage) {

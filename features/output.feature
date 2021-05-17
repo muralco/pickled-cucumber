@@ -29,9 +29,11 @@ Scenario: Capture and suppression disabled
   When the suite is executed
   Then stdout contains
   """
+  logged-on-initial-context-stdout
   .Hello world
-  .....Hello world
-  ..F.
+  .....logged-on-initial-context-stdout
+  .Hello world
+  ..F..
 
   Failures:
 
@@ -48,7 +50,9 @@ Scenario: Capture and suppression disabled
   """
   And stderr contains
   """
+  logged-on-initial-context-stderr
   Bye Bye
+  logged-on-initial-context-stderr
   Bye Bye
   """
 
@@ -57,9 +61,11 @@ Scenario: Capture enabled and suppression disabled
   When the suite is executed
   Then stdout contains
   """
-  ..Hello world
-  ......Hello world
-  ..F.
+  .logged-on-initial-context-stdout
+  .Hello world
+  ......logged-on-initial-context-stdout
+  .Hello world
+  ..F..
 
   Failures:
 
@@ -75,13 +81,16 @@ Scenario: Capture enabled and suppression disabled
          ===============
          Std Err
          -------
+         logged-on-initial-context-stderr
          Bye Bye
 
 
          Std Out
          -------
+         logged-on-initial-context-stdout
          Hello world
 
+     ✔ After
      ✔ After
 
   2 scenarios (1 failed, 1 passed)
@@ -89,7 +98,9 @@ Scenario: Capture enabled and suppression disabled
   """
   And stderr contains
   """
+  logged-on-initial-context-stderr
   Bye Bye
+  logged-on-initial-context-stderr
   Bye Bye
   """
 
@@ -99,7 +110,7 @@ Scenario: Capture enabled and suppression enabled
   When the suite is executed
   Then stdout contains
   """
-  ..........F.
+  ...........F..
 
   Failures:
 
@@ -115,13 +126,16 @@ Scenario: Capture enabled and suppression enabled
          ===============
          Std Err
          -------
+         logged-on-initial-context-stderr
          Bye Bye
 
 
          Std Out
          -------
+         logged-on-initial-context-stdout
          Hello world
 
+     ✔ After
      ✔ After
 
   2 scenarios (1 failed, 1 passed)
@@ -136,7 +150,7 @@ Scenario: Capture disabled and suppression enabled
   When the suite is executed
   Then stdout contains
   """
-  ..........F.
+  ...........F..
 
   Failures:
 
@@ -147,6 +161,7 @@ Scenario: Capture disabled and suppression enabled
      ✔ And message Bye Bye is written to stderr
      ✖ Then error
          Error: Error
+     ✔ After
      ✔ After
 
   2 scenarios (1 failed, 1 passed)
@@ -171,6 +186,7 @@ Scenario: Debug enabled and capture and supression enabled
   When the suite is executed
   Then stdout contains
   """
+  logged-on-initial-context-stdout
   .Hello world
   ....
 
@@ -179,5 +195,6 @@ Scenario: Debug enabled and capture and supression enabled
   """
   And stderr contains
   """
+  logged-on-initial-context-stderr
   Bye Bye
   """

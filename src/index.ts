@@ -8,6 +8,12 @@ import { getCtx, getCtxItem, pushCtxItem, setCtx, setCtxItem } from './context';
 import setupDebug from './debug';
 import setupEntities from './entities';
 import { defineElasticSteps } from './entities/elasticsearch';
+import {
+  triggerAfterInitialContext,
+  triggerAfterTeardown,
+  triggerBeforeInitialContext,
+  triggerBeforeTeardown,
+} from './hooks';
 import setupHttp from './http';
 import setupMisc from './misc';
 import { getOpSpec } from './operators';
@@ -38,11 +44,6 @@ const setup = (
   // Force unhandleded promise rejections to fail (warning => error)
   process.on('unhandledRejection', (up: unknown) => { throw up; });
   // Tear down
-  const getTearDown = () => getCtxItem<TearDownFn[]>('$tearDown');
-  if (!process.env.KEEP_DATA) {
-    After(() => Promise.all(getTearDown().reverse().map(fn => fn())));
-  }
-
   const {
     aliases = {},
     captureOutput,
@@ -57,9 +58,27 @@ const setup = (
     usage,
   } = options;
 
+  if (!debug && (captureOutput || suppressOutput)) {
+    setupOutputCapture(captureOutput, suppressOutput);
+  }
+
+  const getTearDown = () => getCtxItem<TearDownFn[]>('$tearDown');
+  if (!process.env.KEEP_DATA) {
+    After(async () => {
+      triggerBeforeTeardown();
+      try {
+        await Promise.all(getTearDown().reverse().map(fn => fn()));
+      } finally {
+        triggerAfterTeardown();
+      }
+    });
+  }
+
   setDefaultTimeout(timeout || Number(process.env.TEST_TIMEOUT || '10') * 1000);
 
   Before(($scenario) => {
+    // Execute before initial context hook
+    triggerBeforeInitialContext();
     const customCtx = options.initialContext && options.initialContext() || {};
     setCtx({
       random: Date.now(),
@@ -67,6 +86,8 @@ const setup = (
       $scenario,
       $tearDown: [],
     });
+    // Execute after initial context hook
+    triggerAfterInitialContext();
   });
 
   const entityNames = Object.keys(entities);
@@ -112,9 +133,6 @@ const setup = (
   if (hasEntities) setupEntities(entities, args);
   if (elasticSearchIndexUri) defineElasticSteps(elasticSearchIndexUri, args);
   if (http) setupHttp(http, args);
-  if (!debug && (captureOutput || suppressOutput)) {
-    setupOutputCapture(captureOutput, suppressOutput);
-  }
   fn(args);
 
   if (usage) {

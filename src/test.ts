@@ -202,7 +202,14 @@ import setup, { SetupFn } from '../src/index';
 
 ${getCtx('steps-definition')}
 
-setup(fn, ${JSON.stringify(testOptions)});
+setup(fn, {
+  ...${JSON.stringify(testOptions)},
+  initialContext: () => {
+    console.log('logged-on-initial-context-stdout');
+    console.error('logged-on-initial-context-stderr');
+    return {};
+  },
+});
     `;
 
     await writeFile(stepsFile, stepsContent);
@@ -241,7 +248,7 @@ setup(fn, ${JSON.stringify(testOptions)});
   });
   Then('stdout contains', (payload) => {
     const output = getCtx<string>('test-suite-stdout');
-    // Remove last line (used to report status because has timings)
+    // Remove last line (used to report status because has timings
     const filtered = output
       .split('\n')
       .map(line => line.split(' #')[0])
@@ -257,12 +264,11 @@ setup(fn, ${JSON.stringify(testOptions)});
         return true;
       })
       .join('\n');
-
-    assert.deepEqual(filtered, payload);
+    assert.deepEqual(payload, filtered);
   });
   Then('stderr contains', (payload) => {
     const output = getCtx<string>('test-suite-stderr');
-    assert.deepEqual(output, payload);
+    assert.deepEqual(payload, output);
   });
 };
 

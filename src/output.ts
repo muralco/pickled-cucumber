@@ -1,7 +1,16 @@
-import { AfterStep, Before, BeforeStep, Status } from '@cucumber/cucumber';
 import {
-  ITestStepHookParameter,
-} from '@cucumber/cucumber/lib/support_code_library_builder/types';
+  After,
+  AfterStep,
+  Before,
+  BeforeStep,
+  Status,
+} from '@cucumber/cucumber';
+import {
+  AfterInitialContext,
+  AfterTeardown,
+  BeforeInitialContext,
+  BeforeTeardown,
+} from './hooks';
 
 const NO_OUTPUT = '<Nothing was captured>';
 
@@ -13,50 +22,79 @@ interface Interceptor {
   capturedData: string[];
   restore: () => void;
   intercept: () => void;
+  flush: () => void;
 }
 
-const intercept = (
-  target: Writable,
-  capture?: boolean,
-  suppress?: boolean,
-): Interceptor => {
-  const capturedData: string[] = [];
-  const originalWrite = target.write;
-  return {
-    capturedData,
-    intercept: () => {
-      target.write = (a: string) => {
-        if (capture) {
-          capturedData.push(a);
-        }
-        if (!suppress) {
-          originalWrite.call(target, a);
-        }
-      };
-    },
-    restore: () => {
-      target.write = originalWrite;
-    },
-  };
-};
+class StdioInterceptor implements Interceptor {
+  public capturedData: string[] = [];
+  private readonly originalWrite: (a: string) => void;
+
+  constructor(
+    public readonly target: Writable,
+    public readonly capture?: boolean,
+    public readonly suppress?: boolean,
+  ) {
+    this.originalWrite = target.write;
+  }
+
+  flush() {
+    this.capturedData = [];
+  }
+  intercept() {
+    this.target.write = (a: string) => {
+      if (this.capture) {
+        this.capturedData.push(a);
+      }
+      if (!this.suppress) {
+        this.originalWrite.call(this.target, a);
+      }
+    };
+  }
+  restore() {
+    this.target.write = this.originalWrite;
+  }
+}
 
 export const setupOutputCapture = (capture?: boolean, suppress?: boolean) => {
-  let stdOutInterceptor: Interceptor;
-  let stdErrInterceptor: Interceptor;
+  const stdOutInterceptor = new StdioInterceptor(
+    process.stdout,
+    capture,
+    suppress,
+  );
+  const stdErrInterceptor = new StdioInterceptor(
+    process.stderr,
+    capture,
+    suppress,
+  );
 
-  Before(() => {
-    stdOutInterceptor = intercept(process.stdout, capture, suppress);
-    stdErrInterceptor = intercept(process.stderr, capture, suppress);
-  });
+  const restore = () => {
+    stdOutInterceptor.restore();
+    stdErrInterceptor.restore();
+  };
 
-  BeforeStep(() => {
+  const flush = () => {
+    stdOutInterceptor.flush();
+    stdErrInterceptor.flush();
+  };
+
+  const interceptOutput = () => {
     stdOutInterceptor.intercept();
     stdErrInterceptor.intercept();
-  });
+  };
 
-  AfterStep((arg: ITestStepHookParameter) => {
-    if (capture && arg.result.status === Status.FAILED) {
-      arg.result.message += [
+  Before(flush);
+
+  BeforeInitialContext(interceptOutput);
+  BeforeTeardown(interceptOutput);
+  BeforeStep(interceptOutput);
+
+  AfterInitialContext(restore);
+  AfterTeardown(restore);
+  AfterStep(restore);
+
+  After(({ result }) => {
+    if (capture && result && result.status === Status.FAILED) {
+      result.message += [
         '',
         '',
         'Captured Output',
@@ -70,7 +108,7 @@ export const setupOutputCapture = (capture?: boolean, suppress?: boolean) => {
         stdOutInterceptor.capturedData.join('') || NO_OUTPUT,
       ].join('\n');
     }
-    stdOutInterceptor.restore();
-    stdErrInterceptor.restore();
+
   });
+
 };

@@ -4,16 +4,13 @@ import { Headers, HttpFn, Options, Response } from './types';
 
 type FetchFn = typeof fetch;
 
-const wrap = (
-  fetchFn: FetchFn,
-  opts: Options = {},
-): HttpFn => async (originalReq) => {
+const wrap = (fetchFn: FetchFn, opts: Options = {}): HttpFn => async (
+  originalReq,
+) => {
   const req = await mapRequest(originalReq, opts);
 
   const fetchRes = await fetchFn(req.path, {
-    body: req.body
-      ? JSON.stringify(req.body)
-      : undefined,
+    body: req.body ? JSON.stringify(req.body) : undefined,
     headers: req.headers,
     method: req.method,
   });
@@ -21,13 +18,10 @@ const wrap = (
   const fetchHeaders = fetchRes.headers.raw();
 
   const res: Response = {
-    headers: Object.keys(fetchHeaders).reduce(
-      (acc, k) => {
-        acc[k] = fetchHeaders[k] && fetchHeaders[k][0];
-        return acc;
-      },
-      {} as Headers,
-    ),
+    headers: Object.keys(fetchHeaders).reduce((acc, k) => {
+      acc[k] = fetchHeaders[k] && fetchHeaders[k][0];
+      return acc;
+    }, {} as Headers),
     status: fetchRes.status,
     text: await fetchRes.text(),
   };

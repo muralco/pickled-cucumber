@@ -6,7 +6,7 @@ interface Offending {
   path: string | undefined;
 }
 
-const isObject = (item: unknown): item is Object =>
+const isObject = (item: unknown): item is Record<string, unknown> =>
   typeof item === 'object' && !Array.isArray(item) && item !== null;
 
 const recursiveIncludes = (
@@ -14,9 +14,10 @@ const recursiveIncludes = (
   expectedPartial: unknown,
   path?: string,
 ) => {
-  const expected = isObject(actual) && isObject(expectedPartial)
-    ? { ...actual, ...expectedPartial } // make a whole object from a partial
-    : expectedPartial; // is a primitive or array
+  const expected =
+    isObject(actual) && isObject(expectedPartial)
+      ? { ...actual, ...expectedPartial } // make a whole object from a partial
+      : expectedPartial; // is a primitive or array
 
   return recursiveMatch(actual, expected, path, true);
 };
@@ -33,7 +34,7 @@ const findOffendingItem = (actual: unknown, expected: string): Offending => {
     path: recursiveIncludes(a, expected, `${i}`),
   }));
 
-  if (items.some(i => !i.path)) {
+  if (items.some((i) => !i.path)) {
     return { actual, path: undefined };
   }
 
@@ -57,13 +58,14 @@ const op: Operator = {
       assertEquals: true,
       error: 'does not include',
       expected: expectedJson,
-      subError: offending.actual !== NOT_IN_ARRAY
-        ? {
-          actual: getDeep(offending.actual, offending.path),
-          expected: getDeep(expectedJson, offending.path),
-          path: offending.path,
-        }
-        : undefined,
+      subError:
+        offending.actual !== NOT_IN_ARRAY
+          ? {
+              actual: getDeep(offending.actual, offending.path),
+              expected: getDeep(expectedJson, offending.path),
+              path: offending.path,
+            }
+          : undefined,
     };
   },
   name: ['include', 'includes'],

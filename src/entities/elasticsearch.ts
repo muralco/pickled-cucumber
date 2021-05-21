@@ -24,7 +24,7 @@ interface Options<T, Tid extends keyof T> extends EntityOptions<T, Tid> {
 }
 
 const request = async <T>(
-  method: 'DELETE'|'GET'|'POST'|'PUT',
+  method: 'DELETE' | 'GET' | 'POST' | 'PUT',
   path: string,
   body?: unknown,
 ): Promise<T> => {
@@ -47,16 +47,15 @@ const request = async <T>(
   return await res.json();
 };
 
-const create = <T, Tid extends keyof T>(
+const create = <T extends Record<string, unknown>, Tid extends keyof T>(
   indexUri: string,
   indexSuffix: string,
   idProperty: Tid,
   opts: Options<T, Tid> = {},
 ): Entity<T, Tid> => {
-
   const flush = () => request('POST', `${indexUri}/_flush`);
 
-  const search = async (criteria: object) => {
+  const search = async (criteria: Record<string, unknown>) => {
     await flush();
     const docs = await request<QueryResults<T>>(
       'POST',
@@ -66,7 +65,7 @@ const create = <T, Tid extends keyof T>(
     return docs.hits.hits[0];
   };
   const getSource = (doc: Doc<T> | undefined) => doc && doc._source;
-  const getById = (idOrObject: T|T[Tid]) =>
+  const getById = (idOrObject: T | T[Tid]) =>
     search({ query: { term: { _id: `${getId(idProperty, idOrObject)}` } } });
 
   const getRecordUri = (
@@ -83,7 +82,7 @@ const create = <T, Tid extends keyof T>(
     create: async (attrs) => {
       const record = opts.onCreate
         ? await opts.onCreate(attrs)
-        : (attrs || {} as T);
+        : attrs || ({} as T);
 
       const routing = opts.getRouting && opts.getRouting(record);
       await request('PUT', getRecordUri(routing, record), record);
@@ -93,20 +92,18 @@ const create = <T, Tid extends keyof T>(
     delete: async (idOrObject) => {
       const doc = await getById(idOrObject);
       if (!doc) return;
-      await request(
-        'DELETE',
-        getRecordUri(doc._routing, doc._source),
-      );
+      await request('DELETE', getRecordUri(doc._routing, doc._source));
       await flush();
     },
-    findBy: async criteria =>
-      getSource(await search(criteria)),
-    findById: async idOrObject =>
-      getSource(await getById(idOrObject)),
+    findBy: async (criteria) => getSource(await search(criteria)),
+    findById: async (idOrObject) => getSource(await getById(idOrObject)),
     update: async (idOrObject, attrs) => {
       const id = getId(idProperty, idOrObject);
       const record = (await entity.findById(idOrObject)) || {};
-      const recordWithAttrs = { ...record, ...attrs as any };
+      const recordWithAttrs = {
+        ...record,
+        ...(attrs as Record<string, unknown>),
+      };
 
       const recordWithChanges = opts.onUpdate
         ? await opts.onUpdate(recordWithAttrs, id, entity)
@@ -125,21 +122,15 @@ export default create;
 
 export const defineElasticSteps = (
   indexUri: string,
-  {
-    compare,
-    getCtx,
-    setCtx,
-    Then,
-    When,
-  }: SetupFnArgs,
-) => {
+  { compare, getCtx, setCtx, Then, When }: SetupFnArgs,
+): void => {
   When(
     'searching for',
     async (payload) => {
       await request('POST', `${indexUri}/_flush`);
       setCtx(
-      '$search-results',
-      await request('POST', `${indexUri}/_search`, JSON.parse(payload)),
+        '$search-results',
+        await request('POST', `${indexUri}/_search`, JSON.parse(payload)),
       );
     },
     { inline: true },

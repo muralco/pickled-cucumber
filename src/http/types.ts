@@ -2,7 +2,7 @@ export interface Headers {
   [name: string]: string;
 }
 
-export type Method = 'DELETE'|'GET'|'PATCH'|'POST'|'PUT';
+export type Method = 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
 
 export interface Request {
   body?: unknown;
@@ -20,7 +20,7 @@ export interface Response {
 
 export type HttpFn = (request: Request) => Promise<Response>;
 
-type ApplyCredentialsFn = (request: Request) => Request|Promise<Request>;
+type ApplyCredentialsFn = (request: Request) => Request | Promise<Request>;
 
 export interface Options {
   applyCredentials?: ApplyCredentialsFn;

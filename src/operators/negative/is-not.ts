@@ -7,20 +7,18 @@ const op: Operator = {
   exec: (actual, expected) => {
     if (expected === 'null' && actual !== null) return undefined;
     const isUndef = expected === 'undefined';
-    const expectedJson = isUndef
-      ? undefined
-      : JSON.parse(expected);
+    const expectedJson = isUndef ? undefined : JSON.parse(expected);
     const errorPath = recursiveMatch(actual, expectedJson);
     return errorPath !== undefined
       ? undefined
       : {
-        assertEquals: true,
-        error: 'is',
-        expected: expectedJson,
-        path: errorPath,
-      };
+          assertEquals: true,
+          error: 'is',
+          expected: expectedJson,
+          path: errorPath,
+        };
   },
-  name: 'isn\'t',
+  name: "isn't",
 };
 
 export default op;

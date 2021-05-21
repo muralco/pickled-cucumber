@@ -7,8 +7,8 @@ const op: Operator = {
   exec: (actual, expected) => {
     const expectedString = `${JSON.parse(expected)}`;
     return getString(actual).indexOf(expectedString) !== -1
-    ? undefined
-    : { error: 'does not contain', expected: expectedString };
+      ? undefined
+      : { error: 'does not contain', expected: expectedString };
   },
   name: ['contain', 'contains'],
 };

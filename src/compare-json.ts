@@ -10,7 +10,6 @@ function compareJson(
   actual: unknown,
   expected: string,
 ): CompareResult {
-
   const [atPath, atOp] = (atRegExp.exec(opName) || []).slice(1);
 
   const op = atOp || opName;
@@ -18,9 +17,7 @@ function compareJson(
   const operator = ops[op] || DEFAULT_OPS[op];
   if (!operator) throw new Error(`Unknown operator: ${op}`);
 
-  const actualValue = atPath
-    ? getDeep(actual, atPath)
-    : actual;
+  const actualValue = atPath ? getDeep(actual, atPath) : actual;
 
   const result = operator.exec(actualValue, expected);
   if (result === undefined) return undefined;
@@ -37,7 +34,7 @@ function compareJson(
   return {
     ...error,
     full: actual,
-    path: [atPath, result.path].filter(p => !!p).join('.'),
+    path: [atPath, result.path].filter((p) => !!p).join('.'),
   };
 }
 

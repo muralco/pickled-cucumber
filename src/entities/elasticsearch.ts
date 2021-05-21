@@ -47,7 +47,7 @@ const request = async <T>(
   return await res.json();
 };
 
-const create = <T extends Record<string, unknown>, Tid extends keyof T>(
+const create = <T, Tid extends keyof T>(
   indexUri: string,
   indexSuffix: string,
   idProperty: Tid,
@@ -55,7 +55,8 @@ const create = <T extends Record<string, unknown>, Tid extends keyof T>(
 ): Entity<T, Tid> => {
   const flush = () => request('POST', `${indexUri}/_flush`);
 
-  const search = async (criteria: Record<string, unknown>) => {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  const search = async (criteria: object) => {
     await flush();
     const docs = await request<QueryResults<T>>(
       'POST',
@@ -100,10 +101,8 @@ const create = <T extends Record<string, unknown>, Tid extends keyof T>(
     update: async (idOrObject, attrs) => {
       const id = getId(idProperty, idOrObject);
       const record = (await entity.findById(idOrObject)) || {};
-      const recordWithAttrs = {
-        ...record,
-        ...(attrs as Record<string, unknown>),
-      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const recordWithAttrs = { ...record, ...(attrs as any) };
 
       const recordWithChanges = opts.onUpdate
         ? await opts.onUpdate(recordWithAttrs, id, entity)

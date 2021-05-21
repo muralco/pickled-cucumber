@@ -3,7 +3,7 @@ import { getDeep } from './util';
 
 let ctx: Context = {};
 
-export const setCtx = (c: Context): void => (ctx = c);
+export const setCtx = (c: Context): Context => (ctx = c);
 
 export const getCtx = (): Context => ctx;
 

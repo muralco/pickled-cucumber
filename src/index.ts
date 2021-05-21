@@ -43,7 +43,7 @@ export type Options = BaseOptions;
 
 export type SetupFn = (args: SetupFnArgs) => void;
 
-const setup = (fn: SetupFn, options: Options = {}): void => {
+const setup = (fn: SetupFn, options: Options = {}): Step[] => {
   // Force unhandleded promise rejections to fail (warning => error)
   process.on('unhandledRejection', (up: unknown) => {
     throw up;

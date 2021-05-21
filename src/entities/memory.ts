@@ -1,9 +1,6 @@
 import { Entity, IdOrObject } from './types';
 
-const generate = <
-  T extends Record<string | symbol, unknown>,
-  Tid extends keyof T
->(
+const generate = <T, Tid extends keyof T>(
   idField: Tid,
   newId: () => T[Tid],
 ): Entity<T, Tid> => {
@@ -23,12 +20,14 @@ const generate = <
       if (!entity) return;
       entities.splice(entities.findIndex((e) => e === entity, 1));
     },
-    findBy: async (record: Record<string, unknown>) => {
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    findBy: async (record: object) => {
       const entries = Object.entries(record) as Entries;
       return entities.find(
         (e) =>
           entries.every((pair) => e[pair[0]] === pair[1]) ||
-          (idField in record && e[idField] === record[idField]),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (idField in record && e[idField] === (record as any)[idField]),
       );
     },
     findById: async (record) => {

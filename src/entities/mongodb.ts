@@ -1,9 +1,7 @@
 import { Entity, EntityOptions } from './types';
 import { getId } from './util';
 
-type Criteria<T extends Record<string, unknown>, Tid extends keyof T> =
-  | { [id: string]: T[Tid] }
-  | Partial<T>;
+type Criteria<T, Tid extends keyof T> = { [id: string]: T[Tid] } | Partial<T>;
 
 interface Changes<T> {
   $push?: { [k in keyof T]?: T[k][] };
@@ -14,7 +12,7 @@ interface Changes<T> {
 type Void = Promise<void>;
 
 interface MongoClient {
-  collection: <T extends Record<string, unknown>, Tid extends keyof T>(
+  collection: <T, Tid extends keyof T>(
     s: string,
   ) => Promise<{
     deleteOne: (criteria: Criteria<T, Tid>) => Void;
@@ -28,7 +26,7 @@ interface Options<T, Tid extends keyof T> extends EntityOptions<T, Tid> {
   onUpdateChanges?: (changes: Changes<T>) => Changes<T>;
 }
 
-const create = <T extends Record<string, unknown>, Tid extends keyof T>(
+const create = <T, Tid extends keyof T>(
   getDb: () => Promise<MongoClient>,
   collectionName: string,
   idProperty: Tid,

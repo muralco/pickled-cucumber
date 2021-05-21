@@ -52,8 +52,9 @@ const extractStepData = (
   step: messages.Pickle.IPickleStep,
 ): StepData => {
   // All the contorsion below is to be able to access the private gherkin doc
-  const document = (runner as { gherkinDocument: messages.IGherkinDocument })
-    .gherkinDocument;
+  const document = ((runner as unknown) as {
+    gherkinDocument: messages.IGherkinDocument;
+  }).gherkinDocument;
   if (!step.astNodeIds) {
     throw new Error('Step.astNodeIds is not defined');
   }

@@ -1,24 +1,23 @@
 import { Entity, EntityOptions } from './types';
 import { getId } from './util';
 
-type Criteria<T, Tid extends keyof T> =
-  | { [id: string]: T[Tid] }
-  | Partial<T>
-  ;
+type Criteria<T, Tid extends keyof T> = { [id: string]: T[Tid] } | Partial<T>;
 
 interface Changes<T> {
-  $push?: { [k in keyof T]?: T[k][]; };
+  $push?: { [k in keyof T]?: T[k][] };
   $set?: Partial<T>;
-  $unset?: { [k in keyof T]?: 1; };
+  $unset?: { [k in keyof T]?: 1 };
 }
 
 type Void = Promise<void>;
 
 interface MongoClient {
-  collection: <T, Tid extends keyof T>(s: string) => Promise<{
+  collection: <T, Tid extends keyof T>(
+    s: string,
+  ) => Promise<{
     deleteOne: (criteria: Criteria<T, Tid>) => Void;
     insertOne: (o: T) => Void;
-    findOne: (criteria: Criteria<T, Tid>) => Promise<T|null>;
+    findOne: (criteria: Criteria<T, Tid>) => Promise<T | null>;
     updateOne: (Criteria: Criteria<T, Tid>, changes: Changes<T>) => Void;
   }>;
 }
@@ -39,7 +38,7 @@ const create = <T, Tid extends keyof T>(
       const collection = await db.collection<T, Tid>(collectionName);
       const record = opts.onCreate
         ? await opts.onCreate(attrs)
-        : (attrs || {} as T);
+        : attrs || ({} as T);
       await collection.insertOne(record);
       return record;
     },
@@ -58,9 +57,10 @@ const create = <T, Tid extends keyof T>(
       const collection = await db.collection<T, Tid>(collectionName);
       return collection.findOne(criteria);
     },
-    findById: idOrObject => entity.findBy({
-      [idProperty]: getId(idProperty, idOrObject),
-    }),
+    findById: (idOrObject) =>
+      entity.findBy({
+        [idProperty]: getId(idProperty, idOrObject),
+      }),
     update: async (idOrObject, attrs) => {
       const db = await getDb();
       const collection = await db.collection(collectionName);

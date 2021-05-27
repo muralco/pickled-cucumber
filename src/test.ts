@@ -1,6 +1,7 @@
 import { AfterAll } from '@cucumber/cucumber';
 import assert from 'assert';
 import execa from 'execa';
+import fs from 'fs';
 import nodeFetch from 'node-fetch';
 import path from 'path';
 import { promisify } from 'util';
@@ -13,8 +14,7 @@ import httpFetch from './http/fetch';
 import httpSupertest from './http/supertest';
 import setup, { getVariables, Options, SetupFn } from './index';
 import { CompareError } from './operators/types';
-
-const { mkdtemp, rmdir, writeFile } = require('fs').promises;
+const { mkdtemp, rmdir, writeFile } = fs.promises;
 
 let initialTen = 10;
 const ELASTIC_URI = process.env.ELASTIC_URI
@@ -33,7 +33,9 @@ entities['box'] = createMemoryEntity<Box, 'id'>('id', () => (boxId += 1));
 
 // === Test `entities/mongo` ================================================ //
 if (process.env.MONGO_URI) {
+  // eslint-disable-next-line
   const mongo = require('mongodb');
+  // eslint-disable-next-line
   let client: any;
   let connected = false;
 
@@ -51,16 +53,16 @@ if (process.env.MONGO_URI) {
   });
 
   entities['user'] = createMongoEntity(getDb, 'test-users', 'id', {
-    onCreate: attrs => ({ id: Date.now(), ...attrs, created: Date.now() }),
-    onUpdate: attrs => ({ ...attrs, updated: Date.now() }),
+    onCreate: (attrs) => ({ id: Date.now(), ...attrs, created: Date.now() }),
+    onUpdate: (attrs) => ({ ...attrs, updated: Date.now() }),
   });
 }
 
 // === Test `entities/elasticsearch` ======================================== //
 if (ELASTIC_URI) {
   entities['search'] = createElasticEntity(ELASTIC_URI, '/test-type', 'id', {
-    onCreate: attrs => ({ id: Date.now(), ...attrs, created: Date.now() }),
-    onUpdate: attrs => ({ ...attrs, updated: Date.now() }),
+    onCreate: (attrs) => ({ id: Date.now(), ...attrs, created: Date.now() }),
+    onUpdate: (attrs) => ({ ...attrs, updated: Date.now() }),
   });
 }
 
@@ -92,6 +94,7 @@ const options: Options = {
 const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
   // === Test `requireMocks` ================================================ //
   assert.equal(
+    // eslint-disable-next-line
     require('totally-random-module'),
     42,
     'Require mocks are not working',
@@ -122,12 +125,12 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
       expected,
     );
   });
-  Then('the error path is {any}', path =>
+  Then('the error path is {any}', (path) =>
     assert.equal(JSON.stringify(getResult().path), path),
   );
   Then(
     'the full actual value is',
-    actual => assert.deepEqual(JSON.parse(actual), getResult().full),
+    (actual) => assert.deepEqual(JSON.parse(actual), getResult().full),
     { inline: true },
   );
   Then(
@@ -142,7 +145,7 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
       }
     },
   );
-  Then('A proper name can be {proper-name}', name =>
+  Then('A proper name can be {proper-name}', (name) =>
     assert(!!name.match(/^[A-Z]/)),
   );
   Then('the {/api/*} alias matches (.*)', (actual, expected) =>
@@ -150,7 +153,7 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
   );
 
   // === Test `initialContext` ============================================== //
-  When('incrementing the value of {variable}', name =>
+  When('incrementing the value of {variable}', (name) =>
     setCtx(name, getCtx<number>(name) + 1),
   );
   Then('the value of {variable} is {int}', (name, val) =>
@@ -164,7 +167,7 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
       initialTen -= 1;
     });
   });
-  Then('the value of the global initialTen is {int}', val =>
+  Then('the value of the global initialTen is {int}', (val) =>
     assert.equal(initialTen, parseInt(val, 10)),
   );
 
@@ -174,8 +177,8 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
   );
 
   // === Test output ======================================================== //
-  Given('step definition', payload => setCtx('steps-definition', payload));
-  Given('feature file is', payload =>
+  Given('step definition', (payload) => setCtx('steps-definition', payload));
+  Given('feature file is', (payload) =>
     setCtx(`feature-file-content`, payload),
   );
   Given('stdio output is suppressed', () =>
@@ -251,7 +254,7 @@ setup(fn, {
     // Remove last line (used to report status because has timings
     const filtered = output
       .split('\n')
-      .map(line => line.split(' #')[0])
+      .map((line) => line.split(' #')[0])
       .filter((line) => {
         // Remove last line (used to report status because has timings)
         if (line.includes('s (executing steps: ')) {

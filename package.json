@@ -19,11 +19,17 @@
     "@types/node": "^12.12.14",
     "@types/node-fetch": "^2.1.2",
     "@types/progress": "2.0.3",
+    "@typescript-eslint/eslint-plugin": "4.24.0",
+    "@typescript-eslint/parser": "4.24.0",
     "durations": "3.4.2",
+    "eslint": "7.26.0",
+    "eslint-config-mural": "1.1.0",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-muralco": "1.1.4",
+    "eslint-plugin-prettier": "3.4.0",
     "execa": "5.0.0",
+    "prettier": "2.0.5",
     "ts-unused-exports": "^7.0.3",
-    "tslint": "^5.11.0",
-    "tslint-config-airbnb": "^5.9.2",
     "typescript": "^3.7.3"
   },
   "dependencies": {
@@ -31,13 +37,11 @@
     "node-fetch": "^2.2.0",
     "ts-node": "^7.0.0"
   },
-  "peerDependencies": {
-    "@cucumber/cucumber": "7.2.1"
-  },
   "scripts": {
     "build": "npm run lint && tsc",
     "dist": "rm -rf dist && npm run build && npm run test && cp package*.json README.md LICENSE dist && rm dist/test.*",
-    "lint": "tslint -p . && ts-unused-exports tsconfig.json",
+    "lint": "eslint . && ts-unused-exports tsconfig.json",
+    "lint:fix": "eslint --fix .",
     "pack": "npm run dist && cd dist && npm pack",
     "setup": "npm i  && npm i --no-save mongodb@2.2.27",
     "test": "./scripts/test.sh",

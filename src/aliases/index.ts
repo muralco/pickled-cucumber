@@ -9,6 +9,6 @@ const aliases: Aliases = {
   word: /\S+/,
 };
 
-export const getVariables = (s: string) => s.split(/,\s*|\s+and\s+/);
+export const getVariables = (s: string): string[] => s.split(/,\s*|\s+and\s+/);
 
 export default aliases;

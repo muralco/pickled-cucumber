@@ -5,44 +5,35 @@ import { Step, StepFn, StepKind, StepOptions } from './types';
 
 const getDeepString = (ctx: Context, path: string): string => {
   const v = getDeep(ctx, path);
-  return typeof v === 'string'
-    ? v
-    : JSON.stringify(v);
+  return typeof v === 'string' ? v : JSON.stringify(v);
 };
 
 // For each key `var` in `ctx`, replaces all occurrences of `${var}` in `str`
 // with `ctx[var]` .
 const expand = (ctx: Context) => (str: string) =>
-   str && str.toString().replace(
-    /\$\{([^}]+)\}/g,
-    (_, path) => getDeepString(ctx, path),
-  );
+  str &&
+  str
+    .toString()
+    .replace(/\$\{([^}]+)\}/g, (_, path) => getDeepString(ctx, path));
 
 const replaceAll = (s: string, find: string, replace: string): string =>
   s.split(find).join(replace);
 
 // Resolve shorthand expressions into actual regexps
-const resolveRegExp = (
-  aliases: Aliases,
-  regexpString: string,
-) =>
+const resolveRegExp = (aliases: Aliases, regexpString: string) =>
   Object.keys(aliases).reduce(
     (acc, k) => replaceAll(acc, `{${k}}`, `(${aliases[k].source})`),
     regexpString,
   );
 
 // Creates a proxy of fn that calls `expand` on every argument
-const proxyFnFor = (
-  getCtx: () => Context,
-  fn: StepFn,
-  argCount: number,
-) => {
+const proxyFnFor = (getCtx: () => Context, fn: StepFn, argCount: number) => {
   // tslint:disable-next-line prefer-array-literal
   const args = new Array(argCount).fill(undefined).map((_, i) => `a${i}`);
   const body = `{
     const { fn, expand } = this;
     const ex = expand(this.getCtx());
-    return fn(${args.map(a => `ex(${a})`).join(',')});
+    return fn(${args.map((a) => `ex(${a})`).join(',')});
   }`;
   // tslint:disable-next-line no-function-constructor-with-string-args
   return new Function(...args, body).bind({ getCtx, expand, fn });
@@ -65,10 +56,7 @@ const proxyFnFor = (
 //   version of the step that does not include the last argument. Also, when
 //   `optional` is a string, that string is appended to all other version of
 //    this step. Note that setting `optional` implies `inline`
-export default (
-  aliases: Aliases,
-  getCtx: () => Context,
-) => (
+export default (aliases: Aliases, getCtx: () => Context) => (
   kind: StepKind,
   regexpString: string,
   fn: StepFn,
@@ -80,9 +68,8 @@ export default (
   const allAliases = { ...BUILT_IN_ALIASES, ...aliases };
 
   const rawRegExp = resolveRegExp(allAliases, regexpString);
-  const suffix = opt.optional && opt.optional !== true
-    ? ` ${opt.optional}`
-    : '';
+  const suffix =
+    opt.optional && opt.optional !== true ? ` ${opt.optional}` : '';
 
   const steps: Step[] = [];
 

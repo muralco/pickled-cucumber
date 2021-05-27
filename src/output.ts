@@ -55,7 +55,10 @@ class StdioInterceptor implements Interceptor {
   }
 }
 
-export const setupOutputCapture = (capture?: boolean, suppress?: boolean) => {
+export const setupOutputCapture = (
+  capture?: boolean,
+  suppress?: boolean,
+): void => {
   const stdOutInterceptor = new StdioInterceptor(
     process.stdout,
     capture,
@@ -108,7 +111,5 @@ export const setupOutputCapture = (capture?: boolean, suppress?: boolean) => {
         stdOutInterceptor.capturedData.join('') || NO_OUTPUT,
       ].join('\n');
     }
-
   });
-
 };

@@ -25,14 +25,11 @@ const OPERATORS = [
   opIsNot,
   opMatches,
   opStartsWith,
-].reduce<OperatorMap>(
-  (acc, op) => {
-    if (typeof op.name === 'string') acc[op.name] = op;
-    else op.name.forEach(name => acc[name] = op);
-    return acc;
-  },
-  {},
-);
+].reduce<OperatorMap>((acc, op) => {
+  if (typeof op.name === 'string') acc[op.name] = op;
+  else op.name.forEach((name) => (acc[name] = op));
+  return acc;
+}, {});
 
 export default OPERATORS;
 

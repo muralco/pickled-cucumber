@@ -8,22 +8,17 @@ import { Headers, HttpFn, Method, Request, Response } from './types';
 const setup = (
   httpFn: HttpFn,
   { compare, getCtx, Given, setCtx, Then, When }: SetupFnArgs,
-) => {
+): void => {
   const getHeaders = () => getCtx<Headers>('$req-headers');
   const getResponse = () => getCtx<Response>('$res');
   const getResponseBody = (raw: boolean) =>
-    raw
-      ? getResponse().text
-      : JSON.parse(getResponse().text || '{}');
+    raw ? getResponse().text : JSON.parse(getResponse().text || '{}');
 
-  Given(
-    'the request header {word} is "{any}"',
-    (name, value) => {
-      const headers = getHeaders() || {};
-      headers[name] = value;
-      setCtx('$req-headers', headers);
-    },
-  );
+  Given('the request header {word} is "{any}"', (name, value) => {
+    const headers = getHeaders() || {};
+    headers[name] = value;
+    setCtx('$req-headers', headers);
+  });
 
   When(
     '(GET|POST|PUT|PATCH|DELETE|OPTIONS) {word}(?: as {variable})?',
@@ -61,16 +56,10 @@ const setup = (
       `,
     );
   };
-  const assertPayload = (raw: boolean, op: string, payload: string) => compare(
-    op,
-    getResponseBody(raw),
-    payload,
-  );
+  const assertPayload = (raw: boolean, op: string, payload: string) =>
+    compare(op, getResponseBody(raw), payload);
 
-  Then(
-    'the response is {int}',
-    status => assertStatus(Number(status)),
-  );
+  Then('the response is {int}', (status) => assertStatus(Number(status)));
   Then(
     'the( raw)? response payload {op}',
     (raw, op, payload) => assertPayload(!!raw, op, payload),
@@ -78,20 +67,12 @@ const setup = (
   );
   Then(
     'the response text {op}',
-    (op, payload) => compare(
-      op,
-      getResponse().text,
-      payload,
-    ),
+    (op, payload) => compare(op, getResponse().text, payload),
     { inline: true },
   );
   Then(
     'the response headers {op}',
-    (op, payload) => compare(
-      op,
-      getResponse().headers,
-      payload,
-    ),
+    (op, payload) => compare(op, getResponse().headers, payload),
     { inline: true },
   );
   Then(
@@ -102,25 +83,17 @@ const setup = (
     },
     { inline: true },
   );
-  Then(
-    'store the( raw)? response payload in {variable}',
-    (raw, id) => setCtx(
-      id,
-      getResponseBody(!!raw),
-    ),
+  Then('store the( raw)? response payload in {variable}', (raw, id) =>
+    setCtx(id, getResponseBody(!!raw)),
   );
-  Then(
-    'store the response payload at ([\\w_.-]+) in {variable}',
-    (path, id) => setCtx(id, getDeep(getResponseBody(false), path)),
+  Then('store the response payload at ([\\w_.-]+) in {variable}', (path, id) =>
+    setCtx(id, getDeep(getResponseBody(false), path)),
   );
   Then(
     'extract the response location query string argument (.+) into {variable}',
-    (arg, id) => setCtx(
-      id,
-      new URL(getResponse().headers.location).searchParams.get(arg),
-    ),
+    (arg, id) =>
+      setCtx(id, new URL(getResponse().headers.location).searchParams.get(arg)),
   );
-
 };
 
 export default setup;

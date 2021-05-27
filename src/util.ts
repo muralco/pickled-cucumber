@@ -1,9 +1,9 @@
-export const getString = (actual: unknown) =>
+export const getString = (actual: unknown): string =>
   typeof actual === 'string'
     ? actual
     : actual === undefined || actual === null
-      ? JSON.stringify('')
-      : JSON.stringify(actual || '');
+    ? JSON.stringify('')
+    : JSON.stringify(actual || '');
 
 // Checks `a` and `b` and returns `undefined` if they match (i.e. they are
 // deep equal) or the path where they differ.
@@ -32,20 +32,15 @@ export function recursiveMatch(
   if (Array.isArray(a) || Array.isArray(b)) {
     // Fail if one is an array and the other is not, or when the arrays have
     // different sizes
-    if (!Array.isArray(a)
-      || !Array.isArray(b)
-      || a.length !== b.length
-    ) return path;
+    if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length)
+      return path;
 
     // Recurse and return the first element that fails, if any
     return a
-      .map((va, i) => recursiveMatch(
-        va,
-        b[i],
-        path ? `${path}.${i}` : `${i}`,
-        partial,
-      ))
-      .find(path => path !== undefined);
+      .map((va, i) =>
+        recursiveMatch(va, b[i], path ? `${path}.${i}` : `${i}`, partial),
+      )
+      .find((path) => path !== undefined);
   }
 
   // 5) Fail if the values are not objects because, they are not arrays (2) and
@@ -56,42 +51,37 @@ export function recursiveMatch(
   // values
   const aObject = a as { [k: string]: unknown };
   const bObject = b as { [k: string]: unknown };
-  return Object
-    .keys({ ...aObject, ...bObject })
+  return Object.keys({ ...aObject, ...bObject })
     .map((k: string) =>
-        recursiveMatch(
-          aObject[k],
-          bObject[k],
-          path ? `${path}.${k}` : k,
-          partial,
-        ),
-      )
-    .find(path => path !== undefined);
+      recursiveMatch(
+        aObject[k],
+        bObject[k],
+        path ? `${path}.${k}` : k,
+        partial,
+      ),
+    )
+    .find((path) => path !== undefined);
 }
 
 const IDX_REGEX = /(.*)\[(\d+)\]$/;
 
-const getProp = (o: any, prop: string): any|undefined => {
+// eslint-disable-next-line
+const getProp = (o: any, prop: string): any | undefined => {
   const [name, index] = (prop.match(IDX_REGEX) || []).slice(1);
-  return name
-    ? o[name][Number(index)]
-    : index
-      ? o[Number(index)]
-      : o[prop];
+  return name ? o[name][Number(index)] : index ? o[Number(index)] : o[prop];
 };
 
 const getPathSegments = (path: string) =>
-  (path.match(/"[^"]*"|[^.]+/g) || []).map(k => k.replace(/^"(.*)"$/, '$1'));
+  (path.match(/"[^"]*"|[^.]+/g) || []).map((k) => k.replace(/^"(.*)"$/, '$1'));
 
-export const getDeep = (o: unknown, path: string): unknown|undefined =>
+export const getDeep = (o: unknown, path: string): unknown | undefined =>
   path === undefined
     ? undefined
     : getPathSegments(path).reduce(
-      (acc, k) => acc === undefined || acc === null
-        ? undefined
-        : getProp(acc, k),
-      o,
-    );
+        (acc, k) =>
+          acc === undefined || acc === null ? undefined : getProp(acc, k),
+        o,
+      );
 
 export const stringToRegexp = (str: string): RegExp => {
   const [flags] = (str.match(/\/([gimuy]+)$/) || []).slice(1);

@@ -1,6 +1,12 @@
 import {
-    After, AfterAll, Before, BeforeAll,
-    Given, setDefaultTimeout, Then, When,
+  After,
+  AfterAll,
+  Before,
+  BeforeAll,
+  Given,
+  setDefaultTimeout,
+  Then,
+  When,
 } from '@cucumber/cucumber';
 import printAliases from './aliases/printer';
 import compareJson from './compare-json';
@@ -37,12 +43,11 @@ export type Options = BaseOptions;
 
 export type SetupFn = (args: SetupFnArgs) => void;
 
-const setup = (
-  fn: SetupFn,
-  options: Options = {},
-) => {
+const setup = (fn: SetupFn, options: Options = {}): Step[] => {
   // Force unhandleded promise rejections to fail (warning => error)
-  process.on('unhandledRejection', (up: unknown) => { throw up; });
+  process.on('unhandledRejection', (up: unknown) => {
+    throw up;
+  });
   // Tear down
   const {
     aliases = {},
@@ -67,7 +72,11 @@ const setup = (
     After(async () => {
       triggerBeforeTeardown();
       try {
-        await Promise.all(getTearDown().reverse().map(fn => fn()));
+        await Promise.all(
+          getTearDown()
+            .reverse()
+            .map((fn) => fn()),
+        );
       } finally {
         triggerAfterTeardown();
       }
@@ -79,7 +88,8 @@ const setup = (
   Before(($scenario) => {
     // Execute before initial context hook
     triggerBeforeInitialContext();
-    const customCtx = options.initialContext && options.initialContext() || {};
+    const customCtx =
+      (options.initialContext && options.initialContext()) || {};
     setCtx({
       random: Date.now(),
       ...customCtx,
@@ -121,7 +131,7 @@ const setup = (
     },
     getCtx: getCtxItem,
     Given: step('Given'),
-    onTearDown: fn => getTearDown().push(fn),
+    onTearDown: (fn) => getTearDown().push(fn),
     pushCtx: pushCtxItem,
     setCtx: setCtxItem,
     Then: step('Then'),
@@ -150,20 +160,25 @@ const setup = (
     console.log();
     console.log('Variables');
     console.log('---------');
-    console.log(`
+    console.log(
+      `
     \${varName}          => expands to the value bound to varName
     \${varName.propName} => expands to the propName property of varName
     \${varName[0].name}  => expands to the name of the first item of varName
-    `.replace(/^\s+/gm, ''));
+    `.replace(/^\s+/gm, ''),
+    );
   }
 
   if (debug) setupDebug(steps);
 
   steps.forEach((s) => {
     switch (s.kind) {
-      case 'Given': return Given(s.regexp, s.fn);
-      case 'Then': return Then(s.regexp, s.fn);
-      case 'When': return When(s.regexp, s.fn);
+      case 'Given':
+        return Given(s.regexp, s.fn);
+      case 'Then':
+        return Then(s.regexp, s.fn);
+      case 'When':
+        return When(s.regexp, s.fn);
     }
   });
 

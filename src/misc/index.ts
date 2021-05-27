@@ -1,13 +1,9 @@
 import { SetupFnArgs } from '../types';
 
-const setup = (
-  { compare, getCtx, Given, setCtx, Then }: SetupFnArgs,
-) => {
-  Given(
-    'variable {variable} is',
-    (id, payload) => setCtx(id, payload),
-    { inline: true },
-  );
+const setup = ({ compare, getCtx, Given, setCtx, Then }: SetupFnArgs): void => {
+  Given('variable {variable} is', (id, payload) => setCtx(id, payload), {
+    inline: true,
+  });
   Given(
     'variable {variable} results from expanding {variable} with',
     (target, source, replaces) => {

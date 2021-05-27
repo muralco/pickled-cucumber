@@ -4,7 +4,7 @@ import { Headers, HttpFn, Options, Response } from './types';
 
 interface SuperTestResponse {
   headers: Headers;
-  on: (e: 'data'|'end', f: (chunk: string) => void) => void;
+  on: (e: 'data' | 'end', f: (chunk: string) => void) => void;
   setEncoding: (e: 'binary') => void;
   statusCode: number;
   body: string;
@@ -36,7 +36,9 @@ type SuperTest = {
 const binaryParser: ParseFn = (res, callback) => {
   res.setEncoding('binary');
   let text = '';
-  res.on('data', (chunk) => { text += chunk; });
+  res.on('data', (chunk) => {
+    text += chunk;
+  });
   res.on('end', () => callback(null, text));
 };
 
@@ -45,25 +47,19 @@ const applyHeaders = (
   req: SuperTestRequest,
 ): SuperTestRequest =>
   Object.keys(headers)
-    .reduce(
-      (acc, k) => (headers[k] ? acc.set(k, headers[k]) : acc),
-      req,
-    )
+    .reduce((acc, k) => (headers[k] ? acc.set(k, headers[k]) : acc), req)
     .buffer(true)
     .parse(binaryParser);
 
-const wrap = (
-  superTest: SuperTest,
-  opts: Options = {},
-): HttpFn => async (originalReq) => {
+const wrap = (superTest: SuperTest, opts: Options = {}): HttpFn => async (
+  originalReq,
+) => {
   const req = await mapRequest(originalReq, opts);
 
   const k = req.method.toLowerCase() as keyof SuperTest;
 
   const reqMethod = superTest[k](req.path);
-  const reqPayload = req.body
-    ? reqMethod.send(req.body)
-    : reqMethod;
+  const reqPayload = req.body ? reqMethod.send(req.body) : reqMethod;
 
   const reqObject = req.headers
     ? applyHeaders(req.headers, reqPayload)

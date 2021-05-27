@@ -5,11 +5,7 @@ export interface StepOptions {
   optional?: string | boolean;
 }
 
-export type StepKind =
-  | 'Given'
-  | 'Then'
-  | 'When'
-  ;
+export type StepKind = 'Given' | 'Then' | 'When';
 
 export interface Step {
   fn: StepFn;

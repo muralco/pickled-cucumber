@@ -5,7 +5,7 @@ import { EntityMap } from './types';
 const setup = (
   entities: EntityMap,
   { compare, getCtx, Given, onTearDown, setCtx, Then }: SetupFnArgs,
-) => {
+): void => {
   if (!Object.keys(entities).length) return;
 
   Given(
@@ -55,12 +55,8 @@ const setup = (
     (op, payload) => compare(op, getCtx('$last-doc'), payload),
     { inline: true },
   );
-  Then(
-    'the {entity} {variable} was deleted',
-    async (entity, varName) => assert.equal(
-      await entities[entity].findById(getCtx(varName)),
-      null,
-    ),
+  Then('the {entity} {variable} was deleted', async (entity, varName) =>
+    assert.equal(await entities[entity].findById(getCtx(varName)), null),
   );
   Then(
     'store the document for the {entity} with (\\{.*\\}) in {variable}',
@@ -76,7 +72,6 @@ const setup = (
       setCtx(targetVar, doc);
     },
   );
-
 };
 
 export default setup;

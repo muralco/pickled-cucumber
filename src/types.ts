@@ -36,8 +36,8 @@ export type StepDefinitionFn = (
   opts?: StepOptions,
 ) => void;
 
-export type TearDownFn = () => Promise<void>|void;
-type HookFn = (fn: () => Promise<void>|void) => void;
+export type TearDownFn = () => Promise<void> | void;
+type HookFn = (fn: () => Promise<void> | void) => void;
 
 export interface SetupFnArgs {
   After: HookFn;

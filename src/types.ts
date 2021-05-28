@@ -23,6 +23,7 @@ export interface Options {
   entities?: EntityMap;
   http?: HttpFn;
   initialContext?: () => Context;
+  monkeypatchCucumber?: boolean;
   operators?: OperatorMap;
   requireMocks?: RequireMockMap;
   suppressOutput?: boolean;

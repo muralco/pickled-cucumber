@@ -84,6 +84,7 @@ const options: Options = {
     },
     initialFive: 5,
   }),
+  monkeypatchCucumber: true,
   requireMocks: {
     'totally-random-module': 42,
   },

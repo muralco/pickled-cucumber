@@ -26,6 +26,7 @@ import { getOpSpec } from './operators';
 import printOperators, { printError } from './operators/printer';
 import { setupOutputCapture } from './output';
 import setupRequireMock from './require';
+import { monkeypatchStackFilters } from './stack-filters';
 import stepCtor from './steps/constructor';
 import printSteps from './steps/printer';
 import { Step, StepKind } from './steps/types';
@@ -56,12 +57,16 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
     elasticSearchIndexUri,
     entities = {},
     http,
+    monkeypatchCucumber,
     operators = {},
     requireMocks,
     suppressOutput,
     timeout,
     usage,
   } = options;
+  if (monkeypatchCucumber) {
+    monkeypatchStackFilters();
+  }
 
   if (!debug && (captureOutput || suppressOutput)) {
     setupOutputCapture(captureOutput, suppressOutput);

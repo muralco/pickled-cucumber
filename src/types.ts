@@ -30,6 +30,24 @@ export interface Options {
   usage?: boolean;
 }
 
+interface Scenario {
+  gherkinDocument: {
+    feature: {
+      name: string;
+    };
+  };
+  pickle: {
+    name: string;
+    uri: string;
+  };
+  result?: {
+    duration: { seconds: number; nanos: number };
+    status: number;
+    message: string;
+    willBeRetried?: boolean;
+  };
+}
+
 export type StepDefinitionFn = (
   name: string,
   fn: StepFn,
@@ -37,7 +55,7 @@ export type StepDefinitionFn = (
 ) => void;
 
 export type TearDownFn = () => Promise<void> | void;
-type HookFn = (fn: () => Promise<void> | void) => void;
+type HookFn = (fn: (scenario?: Scenario) => Promise<void> | void) => void;
 
 export interface SetupFnArgs {
   After: HookFn;

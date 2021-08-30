@@ -185,7 +185,6 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
     setCtx(`suppression-enabled`, true),
   );
   Given('stdio output is captured', () => setCtx(`capture-enabled`, true));
-  Given('debug module is enabled', () => setCtx(`debug-enabled`, true));
   When('the suite is executed', async () => {
     const testDir = await mkdtemp(`output-test-`);
     const featureFile = path.join(testDir, 'test-feature.feature');
@@ -195,7 +194,6 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
 
     const testOptions: Options = {
       captureOutput: getCtx<boolean | undefined>('capture-enabled'),
-      debug: getCtx<boolean | undefined>('debug-enabled'),
       suppressOutput: getCtx<boolean | undefined>('suppression-enabled'),
     };
 

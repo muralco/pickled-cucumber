@@ -18,7 +18,6 @@ export interface RequireMockMap {
 export interface Options {
   aliases?: Aliases;
   captureOutput?: boolean;
-  debug?: boolean;
   elasticSearchIndexUri?: string;
   entities?: EntityMap;
   http?: HttpFn;

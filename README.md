@@ -517,6 +517,14 @@ Failures:
        If your are seing this tests are broken
 ```
 
+### Formatters
+
+You can use the custom formatter by adding:
+`--format pickled-cucumber/formatter/<formatter-name>` to the cli invocation
+
+Valid formatters are:
+ - `progress-and-profile`: Shows status and time spent on each scenario
+
 #### Caveats
 Deprecation warnings, and output emitted from `v8` or `c++` modules will not be captured.
 

@@ -22,8 +22,9 @@ runTest() {
   MONGO_URI=$WITH_MONGODB \
   ELASTIC_URI=$WITH_ELASTIC \
   ./node_modules/.bin/cucumber-js \
-    --publish-quiet \
     --require-module ts-node/register \
+    --format ./src/formatter/progress-and-profile.ts \
+    --publish-quiet \
     -r src/test.ts \
     $*
 }

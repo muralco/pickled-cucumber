@@ -11,7 +11,6 @@ import {
 import printAliases from './aliases/printer';
 import compareJson from './compare-json';
 import { getCtx, getCtxItem, pushCtxItem, setCtx, setCtxItem } from './context';
-import setupDebug from './debug';
 import setupEntities from './entities';
 import { defineElasticSteps } from './entities/elasticsearch';
 import {
@@ -52,7 +51,6 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
   const {
     aliases = {},
     captureOutput,
-    debug,
     elasticSearchIndexUri,
     entities = {},
     http,
@@ -63,7 +61,7 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
     usage,
   } = options;
 
-  if (!debug && (captureOutput || suppressOutput)) {
+  if (captureOutput || suppressOutput) {
     setupOutputCapture(captureOutput, suppressOutput);
   }
 
@@ -168,8 +166,6 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
     `.replace(/^\s+/gm, ''),
     );
   }
-
-  if (debug) setupDebug(steps);
 
   steps.forEach((s) => {
     switch (s.kind) {

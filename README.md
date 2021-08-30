@@ -357,44 +357,6 @@ Aliases
 0 steps
 ```
 
-### Debug Module
-
-The _debug module_ stops the test execution when the first step fails and drops
-you into a debugging console. In there you can run arbitrary test steps and
-inspect the test context.
-
-To enable the _debug module_ just specify `debug: true` in the setup options.
-It might be a good idea to link this setting to an environment variable so that
-you can control when to drop into the debugging console (i.e. you most
-definitely don't want this happening in CI or in long test runs).
-
-For example:
-
-```js
-const options = {
-  debug: true,
-};
-
-const fn = (args) => {
-  // define your steps here using args
-}
-
-setup(fn, options);
-```
-
-When dropped into the debugging console, just type `help` to see available
-commands.
-
-Note that you can also run arbitrary test steps in the console and you can use
-the `steps` command to see all available steps.
-
-Also note that you have `<Tab>` completion in the console so make sure you use
-it (hitting `<Tab><Tab>` in the console will show you everything you can do!).
-
-```
-debug> help
-```
-
 ### Alias Module
 
 The _alias module_ allows you to (re-)define regular expression aliases that you
@@ -554,7 +516,6 @@ Failures:
        -------
        If your are seing this tests are broken
 ```
-Note: capture functionality is disabled if _debug module_ is enabled.
 
 #### Caveats
 Deprecation warnings, and output emitted from `v8` or `c++` modules will not be captured.

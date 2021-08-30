@@ -170,31 +170,3 @@ Scenario: Capture disabled and suppression enabled
   And stderr contains
   """
   """
-
-Scenario: Debug enabled and capture and supression enabled
-  Given feature file is
-  """
-  Feature: test with debug
-  Scenario: all ok
-    When message Hello world is written to stdout
-    And message Bye Bye is written to stderr
-    Then no error
-  """
-  Given stdio output is captured
-  And stdio output is suppressed
-  And debug module is enabled
-  When the suite is executed
-  Then stdout contains
-  """
-  logged-on-initial-context-stdout
-  .Hello world
-  ....
-
-  1 scenario (1 passed)
-  3 steps (3 passed)
-  """
-  And stderr contains
-  """
-  logged-on-initial-context-stderr
-  Bye Bye
-  """

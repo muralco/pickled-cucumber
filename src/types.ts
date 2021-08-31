@@ -1,3 +1,4 @@
+import { ITestCaseHookParameter } from '@cucumber/cucumber/lib/support_code_library_builder/types';
 import { EntityMap } from './entities/types';
 import { HttpFn } from './http/types';
 import { OperatorMap } from './operators/types';
@@ -30,24 +31,6 @@ export interface Options {
   usage?: boolean;
 }
 
-interface Scenario {
-  gherkinDocument: {
-    feature: {
-      name: string;
-    };
-  };
-  pickle: {
-    name: string;
-    uri: string;
-  };
-  result?: {
-    duration: { seconds: number; nanos: number };
-    status: number;
-    message: string;
-    willBeRetried?: boolean;
-  };
-}
-
 export type StepDefinitionFn = (
   name: string,
   fn: StepFn,
@@ -55,13 +38,15 @@ export type StepDefinitionFn = (
 ) => void;
 
 export type TearDownFn = () => Promise<void> | void;
-type HookFn = (fn: (scenario?: Scenario) => Promise<void> | void) => void;
+type TestCaseHookFn = (
+  fn: (scenario?: ITestCaseHookParameter) => Promise<void> | void,
+) => void;
 
 export interface SetupFnArgs {
-  After: HookFn;
-  AfterAll: HookFn;
-  Before: HookFn;
-  BeforeAll: HookFn;
+  After: TestCaseHookFn;
+  AfterAll: TestCaseHookFn;
+  Before: TestCaseHookFn;
+  BeforeAll: TestCaseHookFn;
   compare: (op: string, actual: unknown, expected: string) => void;
   getCtx: <T>(name: string) => T;
   Given: StepDefinitionFn;

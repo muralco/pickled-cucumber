@@ -1,8 +1,10 @@
 import {
   After,
   AfterAll,
+  AfterStep,
   Before,
   BeforeAll,
+  BeforeStep,
   Given,
   setDefaultTimeout,
   Then,
@@ -123,8 +125,10 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
   const args: SetupFnArgs = {
     After,
     AfterAll,
+    AfterStep,
     Before,
     BeforeAll,
+    BeforeStep,
     compare: (op, a, e) => {
       const error = compareJson(operators, op, a, e);
       if (error !== undefined) printError(error);

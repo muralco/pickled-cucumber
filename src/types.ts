@@ -1,8 +1,4 @@
-import {
-  IDefineSupportCodeMethods,
-  TestCaseHookFunction,
-  TestStepHookFunction,
-} from '@cucumber/cucumber/lib/support_code_library_builder/types';
+import { IDefineSupportCodeMethods } from '@cucumber/cucumber/lib/support_code_library_builder/types';
 import { EntityMap } from './entities/types';
 import { HttpFn } from './http/types';
 import { OperatorMap } from './operators/types';

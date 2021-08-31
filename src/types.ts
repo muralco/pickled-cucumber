@@ -42,11 +42,13 @@ type TestCaseHookFn = (
   fn: (scenario?: ITestCaseHookParameter) => Promise<void> | void,
 ) => void;
 
+type TestsExecutionHookFn = (fn: () => Promise<void> | void) => void;
+
 export interface SetupFnArgs {
   After: TestCaseHookFn;
-  AfterAll: TestCaseHookFn;
+  AfterAll: TestsExecutionHookFn;
   Before: TestCaseHookFn;
-  BeforeAll: TestCaseHookFn;
+  BeforeAll: TestsExecutionHookFn;
   compare: (op: string, actual: unknown, expected: string) => void;
   getCtx: <T>(name: string) => T;
   Given: StepDefinitionFn;

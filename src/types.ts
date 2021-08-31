@@ -1,6 +1,7 @@
 import {
-  ITestCaseHookParameter,
-  ITestStepHookParameter,
+  IDefineSupportCodeMethods,
+  TestCaseHookFunction,
+  TestStepHookFunction,
 } from '@cucumber/cucumber/lib/support_code_library_builder/types';
 import { EntityMap } from './entities/types';
 import { HttpFn } from './http/types';
@@ -42,23 +43,10 @@ export type StepDefinitionFn = (
 
 export type TearDownFn = () => Promise<void> | void;
 
-type TestCaseHookFn = (
-  fn: (scenario?: ITestCaseHookParameter) => Promise<void> | void,
-) => void;
-
-type TestStepHookFn = (
-  fn: (scenarioStep?: ITestStepHookParameter) => Promise<void> | void,
-) => void;
-
-type TestsExecutionHookFn = (fn: () => Promise<void> | void) => void;
-
-export interface SetupFnArgs {
-  After: TestCaseHookFn;
-  AfterStep: TestStepHookFn;
-  AfterAll: TestsExecutionHookFn;
-  Before: TestCaseHookFn;
-  BeforeStep: TestStepHookFn;
-  BeforeAll: TestsExecutionHookFn;
+export type SetupFnArgs = Pick<
+  IDefineSupportCodeMethods,
+  'After' | 'AfterStep' | 'AfterAll' | 'Before' | 'BeforeStep' | 'BeforeAll'
+> & {
   compare: (op: string, actual: unknown, expected: string) => void;
   getCtx: <T>(name: string) => T;
   Given: StepDefinitionFn;
@@ -67,4 +55,4 @@ export interface SetupFnArgs {
   setCtx: <T>(name: string, value: T) => void;
   Then: StepDefinitionFn;
   When: StepDefinitionFn;
-}
+};

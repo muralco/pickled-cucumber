@@ -516,6 +516,8 @@ Failures:
        -------
        If your are seing this tests are broken
 ```
+#### Caveats
+Deprecation warnings, and output emitted from `v8` or `c++` modules will not be captured.
 
 ### Formatters
 
@@ -524,9 +526,8 @@ You can use the custom formatter by adding:
 
 Valid formatters are:
  - `progress-and-profile`: Shows status and time spent on each scenario
+ - `profile-jsonl`: Output json lines with duration information of each scenario 
 
-#### Caveats
-Deprecation warnings, and output emitted from `v8` or `c++` modules will not be captured.
 
 ### Operators Module
 

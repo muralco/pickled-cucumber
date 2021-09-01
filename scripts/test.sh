@@ -24,6 +24,7 @@ runTest() {
   ./node_modules/.bin/cucumber-js \
     --require-module ts-node/register \
     --format ./src/formatter/progress-and-profile.ts \
+    --format ./src/formatter/profile-jsonl.ts:profile.jsonl \
     --publish-quiet \
     -r src/test.ts \
     $*

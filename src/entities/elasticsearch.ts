@@ -57,7 +57,6 @@ const create = <T, Tid extends keyof T>(
 
   // eslint-disable-next-line @typescript-eslint/ban-types
   const search = async (criteria: object) => {
-    await flush();
     const docs = await request<QueryResults<T>>(
       'POST',
       `${indexUri}/_search`,

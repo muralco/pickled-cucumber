@@ -53,11 +53,13 @@ const create = <T, Tid extends keyof T>(
   idProperty: Tid,
   opts: Options<T, Tid> = {},
 ): Entity<T, Tid> => {
-  const flush = () => request('POST', `${indexUri}/_flush`);
+  // Refresh the index so that all operations performed since the last refresh
+  // are available for search.
+  // See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/indices-refresh.html
+  const refresh = () => request('POST', `${indexUri}/_refresh`);
 
   // eslint-disable-next-line @typescript-eslint/ban-types
   const search = async (criteria: object) => {
-    await flush();
     const docs = await request<QueryResults<T>>(
       'POST',
       `${indexUri}/_search`,
@@ -87,14 +89,14 @@ const create = <T, Tid extends keyof T>(
 
       const routing = opts.getRouting && opts.getRouting(record);
       await request('PUT', getRecordUri(routing, record), record);
-      await flush();
+      await refresh();
       return record;
     },
     delete: async (idOrObject) => {
       const doc = await getById(idOrObject);
       if (!doc) return;
       await request('DELETE', getRecordUri(doc._routing, doc._source));
-      await flush();
+      await refresh();
     },
     findBy: async (criteria) => getSource(await search(criteria)),
     findById: async (idOrObject) => getSource(await getById(idOrObject)),
@@ -109,7 +111,7 @@ const create = <T, Tid extends keyof T>(
         : recordWithAttrs;
 
       await entity.create(recordWithChanges);
-      await flush();
+      await refresh();
       return recordWithChanges;
     },
   };
@@ -126,7 +128,7 @@ export const defineElasticSteps = (
   When(
     'searching for',
     async (payload) => {
-      await request('POST', `${indexUri}/_flush`);
+      await request('POST', `${indexUri}/_refresh`);
       setCtx(
         '$search-results',
         await request('POST', `${indexUri}/_search`, JSON.parse(payload)),

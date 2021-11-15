@@ -51,3 +51,8 @@ export type SetupFnArgs = Pick<
   Then: StepDefinitionFn;
   When: StepDefinitionFn;
 };
+
+export interface OffendingItemResult {
+  actual: unknown;
+  path: string | undefined;
+}

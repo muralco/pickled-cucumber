@@ -1,3 +1,5 @@
+import { OffendingItemResult } from './types';
+
 export const getString = (actual: unknown): string =>
   typeof actual === 'string'
     ? actual
@@ -91,4 +93,46 @@ export const stringToRegexp = (str: string): RegExp => {
     .replace(/^"(.*)"$/, '$1');
 
   return new RegExp(expectedString, flags);
+};
+
+const isObject = (item: unknown): item is Record<string, unknown> =>
+  typeof item === 'object' && !Array.isArray(item) && item !== null;
+
+const recursiveIncludes = (
+  actual: unknown,
+  expectedPartial: unknown,
+  path?: string,
+) => {
+  const expected =
+    isObject(actual) && isObject(expectedPartial)
+      ? { ...actual, ...expectedPartial } // make a whole object from a partial
+      : expectedPartial; // is a primitive or array
+
+  return recursiveMatch(actual, expected, path, true);
+};
+
+export const NOT_IN_ARRAY = {};
+
+export const findOffendingItem = (
+  actual: unknown,
+  expected: string,
+): OffendingItemResult => {
+  if (!Array.isArray(actual)) {
+    return { actual, path: recursiveIncludes(actual, expected) };
+  }
+
+  const items = actual.map((a, i) => ({
+    actual: a,
+    path: recursiveIncludes(a, expected, `${i}`),
+  }));
+
+  if (items.some((i) => !i.path)) {
+    return { actual, path: undefined };
+  }
+
+  if (!items.length) {
+    return { actual: NOT_IN_ARRAY, path: '0' };
+  }
+
+  return { actual: NOT_IN_ARRAY, path: items[0].path };
 };

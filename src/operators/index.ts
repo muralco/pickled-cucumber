@@ -1,6 +1,7 @@
 import opDoesNotContain from './negative/does-not-contain';
 import opDoesNotExist from './negative/does-not-exist';
 import opDoesNotHaveKeys from './negative/does-not-have-keys';
+import opDoesNotInclude from './negative/does-not-include';
 import opDoesNotMatch from './negative/does-not-match';
 import opIsNot from './negative/is-not';
 import opContains from './positive/contains';
@@ -17,6 +18,7 @@ const OPERATORS = [
   opDoesNotContain,
   opDoesNotExist,
   opDoesNotHaveKeys,
+  opDoesNotInclude,
   opDoesNotMatch,
   opExists,
   opHasKeys,

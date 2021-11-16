@@ -1,4 +1,4 @@
-import { OffendingItemResult } from './types';
+import { RecursivePartialMatchResult } from './types';
 
 export const getString = (actual: unknown): string =>
   typeof actual === 'string'
@@ -7,8 +7,10 @@ export const getString = (actual: unknown): string =>
     ? JSON.stringify('')
     : JSON.stringify(actual || '');
 
-// Checks `a` and `b` and returns `undefined` if they match (i.e. they are
-// deep equal) or the path where they differ.
+/**
+ * Checks `a` and `b` and returns `undefined` if they match (i.e. they are
+ * deep equal) or the path where they differ.
+ */
 export function recursiveMatch(
   a: unknown,
   b: unknown,
@@ -98,6 +100,11 @@ export const stringToRegexp = (str: string): RegExp => {
 const isObject = (item: unknown): item is Record<string, unknown> =>
   typeof item === 'object' && !Array.isArray(item) && item !== null;
 
+/**
+ * Recursivelly checks if `actual` has an `expectedPartial` at `path`
+ * TODO: rename recursivePartialMatch
+ * @param actual Actual item being compared
+ */
 const recursiveIncludes = (
   actual: unknown,
   expectedPartial: unknown,
@@ -111,28 +118,40 @@ const recursiveIncludes = (
   return recursiveMatch(actual, expected, path, true);
 };
 
-export const NOT_IN_ARRAY = {};
+export const NOT_IN_ARRAY = Symbol('NOT_IN_ARRAY');
 
 export const findOffendingItem = (
   actual: unknown,
   expected: string,
-): OffendingItemResult => {
+): RecursivePartialMatchResult => {
+  // Actual is not an array, test partial `expected` match against `actual`
   if (!Array.isArray(actual)) {
-    return { actual, path: recursiveIncludes(actual, expected) };
+    const path = recursiveIncludes(actual, expected);
+    const matched = path === undefined;
+    return { actual, path: path || '', matched };
   }
 
-  const items = actual.map((a, i) => ({
-    actual: a,
-    path: recursiveIncludes(a, expected, `${i}`),
-  }));
+  // Actual it an array, test partial for each item
+  const items = actual.map((a, i) => {
+    const path = recursiveIncludes(a, expected, `${i}`);
+    const matched = path === undefined;
+    return {
+      actual: a,
+      path: path || `${i}`,
+      matched,
+    };
+  });
 
-  if (items.some((i) => !i.path)) {
-    return { actual, path: undefined };
+  // Return the first matched item
+  const matchedItem = items.find(({ matched }) => matched);
+  if (matchedItem) {
+    return { actual, path: `${matchedItem.path}`, matched: true };
   }
 
-  if (!items.length) {
-    return { actual: NOT_IN_ARRAY, path: '0' };
-  }
-
-  return { actual: NOT_IN_ARRAY, path: items[0].path };
+  // Otherwise, the match fails
+  return {
+    actual: NOT_IN_ARRAY,
+    path: items.length ? items[0].path : '0',
+    matched: false,
+  };
 };

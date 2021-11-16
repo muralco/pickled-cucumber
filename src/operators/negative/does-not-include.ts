@@ -8,12 +8,13 @@ const op: Operator = {
     const expectedJson = JSON.parse(expected);
     const offending = findOffendingItem(actual, expectedJson);
 
-    if (offending.path !== undefined) return undefined;
+    if (!offending.matched) return undefined;
 
     return {
       assertEquals: true,
       error: 'does include',
       expected: expectedJson,
+      path: offending.path,
     };
   },
   name: ['do not include', 'does not include'],

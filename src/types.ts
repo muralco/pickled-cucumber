@@ -52,7 +52,8 @@ export type SetupFnArgs = Pick<
   When: StepDefinitionFn;
 };
 
-export interface OffendingItemResult {
-  actual: unknown;
-  path: string | undefined;
+export interface RecursivePartialMatchResult {
+  actual?: unknown;
+  matched: boolean;
+  path: string;
 }

@@ -1,4 +1,4 @@
-import { findOffendingItem } from '../../util';
+import { findPartialInCollection } from '../../util';
 import { Operator } from '../types';
 
 const op: Operator = {
@@ -6,7 +6,7 @@ const op: Operator = {
   description: `checks that the array or object 'a' does not include the partial 'b'`,
   exec: (actual, expected) => {
     const expectedJson = JSON.parse(expected);
-    const offending = findOffendingItem(actual, expectedJson);
+    const offending = findPartialInCollection(actual, expectedJson);
 
     if (!offending.matched) return undefined;
 

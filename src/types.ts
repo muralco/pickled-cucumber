@@ -52,7 +52,7 @@ export type SetupFnArgs = Pick<
   When: StepDefinitionFn;
 };
 
-export interface RecursivePartialMatchResult {
+export interface PartialFindResult {
   actual?: unknown;
   matched: boolean;
   path: string;

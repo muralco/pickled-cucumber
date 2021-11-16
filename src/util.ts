@@ -1,4 +1,4 @@
-import { RecursivePartialMatchResult } from './types';
+import { PartialFindResult } from './types';
 
 export const getString = (actual: unknown): string =>
   typeof actual === 'string'
@@ -67,6 +67,23 @@ export function recursiveMatch(
     .find((path) => path !== undefined);
 }
 
+/**
+ * Recursivelly checks if `actual` has an `expectedPartial` at `path`
+ * @param actual Actual item being compared
+ */
+const recursivePartialMatch = (
+  actual: unknown,
+  expectedPartial: unknown,
+  path?: string,
+) => {
+  const expected =
+    isObject(actual) && isObject(expectedPartial)
+      ? { ...actual, ...expectedPartial } // make a whole object from a partial
+      : expectedPartial; // is a primitive or array
+
+  return recursiveMatch(actual, expected, path, true);
+};
+
 const IDX_REGEX = /(.*)\[(\d+)\]$/;
 
 // eslint-disable-next-line
@@ -77,6 +94,9 @@ const getProp = (o: any, prop: string): any | undefined => {
 
 const getPathSegments = (path: string) =>
   (path.match(/"[^"]*"|[^.]+/g) || []).map((k) => k.replace(/^"(.*)"$/, '$1'));
+
+const isObject = (item: unknown): item is Record<string, unknown> =>
+  typeof item === 'object' && !Array.isArray(item) && item !== null;
 
 export const getDeep = (o: unknown, path: string): unknown | undefined =>
   path === undefined
@@ -97,43 +117,27 @@ export const stringToRegexp = (str: string): RegExp => {
   return new RegExp(expectedString, flags);
 };
 
-const isObject = (item: unknown): item is Record<string, unknown> =>
-  typeof item === 'object' && !Array.isArray(item) && item !== null;
-
-/**
- * Recursivelly checks if `actual` has an `expectedPartial` at `path`
- * TODO: rename recursivePartialMatch
- * @param actual Actual item being compared
- */
-const recursiveIncludes = (
-  actual: unknown,
-  expectedPartial: unknown,
-  path?: string,
-) => {
-  const expected =
-    isObject(actual) && isObject(expectedPartial)
-      ? { ...actual, ...expectedPartial } // make a whole object from a partial
-      : expectedPartial; // is a primitive or array
-
-  return recursiveMatch(actual, expected, path, true);
-};
-
 export const NOT_IN_ARRAY = Symbol('NOT_IN_ARRAY');
 
-export const findOffendingItem = (
+/**
+ * Find a partial inside an array using recursivePartialMatch.
+ * The returned path is the index in which it was found, or in the
+ * case of failing, the path where it differs.
+ */
+export const findPartialInCollection = (
   actual: unknown,
   expected: string,
-): RecursivePartialMatchResult => {
+): PartialFindResult => {
   // Actual is not an array, test partial `expected` match against `actual`
   if (!Array.isArray(actual)) {
-    const path = recursiveIncludes(actual, expected);
+    const path = recursivePartialMatch(actual, expected);
     const matched = path === undefined;
     return { actual, path: path || '', matched };
   }
 
   // Actual it an array, test partial for each item
   const items = actual.map((a, i) => {
-    const path = recursiveIncludes(a, expected, `${i}`);
+    const path = recursivePartialMatch(a, expected, `${i}`);
     const matched = path === undefined;
     return {
       actual: a,

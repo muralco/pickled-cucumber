@@ -42,17 +42,34 @@ export default class ProgressAndProfileFormatter extends SummaryFormatter {
     );
     const coloredStatus = this.formatStatus(status);
 
-    const coloredFeature = this.colorFns.tag(
-      gherkinDocument.feature?.name ?? '<Empty>',
-    );
+    const ruleId = pickle.astNodeIds[0];
+    let ruleName = '';
+    gherkinDocument.feature?.children.forEach(({ rule }) => {
+      if (rule?.children?.some(({ scenario }) => scenario?.id === ruleId))
+        ruleName = rule?.name;
+    });
+    const coloredFeature =
+      gherkinDocument.feature &&
+      this.formatFeature(gherkinDocument.feature, ruleName);
 
     const humaneDuration = humanizeDuration(scenarioDuration(parsed));
 
     this.log(
-      `[${coloredStatus}] (${humaneDuration}) ${coloredFeature} ${this.colorFns.location(
-        '>',
-      )} ${pickle.name} # ${formattedLocation}\n`,
+      `[${coloredStatus}] (${humaneDuration}) ${coloredFeature} ${pickle.name} # ${formattedLocation}\n`,
     );
+  }
+
+  private formatFeature(feature: messages.Feature, rule?: string) {
+    if (rule) {
+      return `${this.colorFns.tag(feature.name)} ${this.colorFns.location(
+        '>',
+      )} ${this.colorFns.tag(rule)} ${this.colorFns.location('>')}`;
+    } else if (feature.name) {
+      return `${this.colorFns.tag(feature.name)} ${this.colorFns.location(
+        '>',
+      )}`;
+    }
+    return '<Empty>';
   }
 
   private formatStatus(status: messages.TestStepResultStatus): string {

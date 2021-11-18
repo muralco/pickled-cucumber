@@ -1,8 +1,8 @@
-import { IDefineSupportCodeMethods } from '@cucumber/cucumber/lib/support_code_library_builder/types';
-import { EntityMap } from './entities/types';
-import { HttpFn } from './http/types';
-import { OperatorMap } from './operators/types';
-import { StepFn, StepOptions } from './steps/types';
+import type { IDefineSupportCodeMethods } from '@cucumber/cucumber/lib/support_code_library_builder/types';
+import type { EntityMap } from './entities/types';
+import type { HttpFn } from './http/types';
+import type { OperatorMap } from './operators/types';
+import type { StepFn, StepOptions } from './steps/types';
 
 export interface Context {
   [key: string]: unknown;

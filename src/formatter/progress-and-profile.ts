@@ -1,7 +1,7 @@
 import { SummaryFormatter, formatterHelpers, Status } from '@cucumber/cucumber';
-import { IFormatterOptions } from '@cucumber/cucumber/lib/formatter';
-import { ILineAndUri } from '@cucumber/cucumber/lib/types';
-import * as messages from '@cucumber/messages';
+import type { IFormatterOptions } from '@cucumber/cucumber/lib/formatter';
+import type { ILineAndUri } from '@cucumber/cucumber/lib/types';
+import type * as messages from '@cucumber/messages';
 import { humanizeDuration, scenarioDuration } from '../durations';
 /**
  * Formatter class

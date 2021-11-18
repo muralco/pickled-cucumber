@@ -1,6 +1,6 @@
 import { SummaryFormatter, formatterHelpers, Status } from '@cucumber/cucumber';
-import { IFormatterOptions } from '@cucumber/cucumber/lib/formatter';
-import * as messages from '@cucumber/messages';
+import type { IFormatterOptions } from '@cucumber/cucumber/lib/formatter';
+import type * as messages from '@cucumber/messages';
 import { scenarioDurationMs } from '../durations';
 
 // ts-unused-exports:disable-next-line

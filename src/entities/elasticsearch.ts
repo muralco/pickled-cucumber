@@ -60,6 +60,12 @@ const create = <T, Tid extends keyof T>(
 
   // eslint-disable-next-line @typescript-eslint/ban-types
   const search = async (criteria: object) => {
+    // We need to call refresh here to account for the "subject under test" code
+    // updating the index. When running our test-side queries we want to make
+    // sure we are seeing the latest index to prevent race conditions. This can
+    // be improved further if we detect that we just refreshed in the previous
+    // step but that detection is proving difficult to implement consistently.
+    await refresh();
     const docs = await request<QueryResults<T>>(
       'POST',
       `${indexUri}/_search`,

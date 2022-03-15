@@ -1,6 +1,6 @@
 {
   "name": "pickled-cucumber",
-  "version": "3.2.3",
+  "version": "3.2.4",
   "description": "Cucumber test runner with several condiments",
   "main": "index.js",
   "types": "index.d.ts",
@@ -22,7 +22,7 @@
     "@typescript-eslint/eslint-plugin": "4.24.0",
     "@typescript-eslint/parser": "4.24.0",
     "durations": "3.4.2",
-    "eslint": "7.26.0",
+    "eslint": "^7.26.0",
     "eslint-config-mural": "1.1.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-muralco": "1.1.4",

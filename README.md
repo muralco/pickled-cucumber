@@ -525,7 +525,11 @@ You can use the custom formatter by adding:
 `--format pickled-cucumber/formatter/<formatter-name>` to the cli invocation
 
 Valid formatters are:
- - `progress-and-profile`: Shows status and time spent on each scenario
+ - `progress-and-profile`: Shows status and time spent on each scenario.
+    Note: this formatter understands the `PICKLED_NO_WARN` environment variable
+    that will suppress the default `cucumberjs` warning output for tests. This
+    is really useful when you run tests with `--retry` and want to focus on the
+    errors.
  - `profile-jsonl`: Output json lines with duration information of each scenario 
 
 

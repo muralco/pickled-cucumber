@@ -3,12 +3,14 @@ import { IFormatterOptions } from '@cucumber/cucumber/lib/formatter';
 import { ILineAndUri } from '@cucumber/cucumber/lib/types';
 import * as messages from '@cucumber/messages';
 import { humanizeDuration, scenarioDuration } from '../durations';
+
+export type FirstArg<T> = T extends (X: infer X) => void ? X : never;
+
 /**
  * Formatter class
  *
  * Cucumber requires it to be the export default
  */
-
 // ts-unused-exports:disable-next-line
 export default class ProgressAndProfileFormatter extends SummaryFormatter {
   constructor(options: IFormatterOptions) {
@@ -82,5 +84,16 @@ export default class ProgressAndProfileFormatter extends SummaryFormatter {
     }
     const { line, uri } = sourceLocation;
     return this.colorFns.location(`${uri}:${line}`);
+  }
+
+  logIssues(args: FirstArg<SummaryFormatter['logIssues']>): void {
+    if (
+      process.env.PICKLED_NO_WARN &&
+      args.title &&
+      args.title.includes('Warning')
+    ) {
+      return;
+    }
+    return super.logIssues(args);
   }
 }

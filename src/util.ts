@@ -3,7 +3,7 @@ export const getString = (actual: unknown): string =>
     ? actual
     : actual === undefined || actual === null
     ? JSON.stringify('')
-    : JSON.stringify(actual || '');
+    : JSON.stringify(actual);
 
 // Checks `a` and `b` and returns `undefined` if they match (i.e. they are
 // deep equal) or the path where they differ.

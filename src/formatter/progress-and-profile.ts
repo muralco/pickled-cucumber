@@ -9,6 +9,8 @@ import { humanizeDuration, scenarioDuration } from '../durations';
  * Cucumber requires it to be the export default
  */
 
+type FirstArg<T> = T extends (X: infer X) => void ? X : never;
+
 // ts-unused-exports:disable-next-line
 export default class ProgressAndProfileFormatter extends SummaryFormatter {
   constructor(options: IFormatterOptions) {
@@ -82,5 +84,16 @@ export default class ProgressAndProfileFormatter extends SummaryFormatter {
     }
     const { line, uri } = sourceLocation;
     return this.colorFns.location(`${uri}:${line}`);
+  }
+
+  logIssues(args: FirstArg<SummaryFormatter['logIssues']>): void {
+    if (
+      process.env.PICKLED_NO_WARN &&
+      args.title &&
+      args.title.includes('Warning')
+    ) {
+      return;
+    }
+    return super.logIssues(args);
   }
 }

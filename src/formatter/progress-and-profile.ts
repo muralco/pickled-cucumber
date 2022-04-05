@@ -3,14 +3,14 @@ import { IFormatterOptions } from '@cucumber/cucumber/lib/formatter';
 import { ILineAndUri } from '@cucumber/cucumber/lib/types';
 import * as messages from '@cucumber/messages';
 import { humanizeDuration, scenarioDuration } from '../durations';
+
+export type FirstArg<T> = T extends (X: infer X) => void ? X : never;
+
 /**
  * Formatter class
  *
  * Cucumber requires it to be the export default
  */
-
-type FirstArg<T> = T extends (X: infer X) => void ? X : never;
-
 // ts-unused-exports:disable-next-line
 export default class ProgressAndProfileFormatter extends SummaryFormatter {
   constructor(options: IFormatterOptions) {

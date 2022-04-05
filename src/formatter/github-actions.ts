@@ -2,6 +2,7 @@ import { SummaryFormatter, formatterHelpers } from '@cucumber/cucumber';
 import { IFormatterOptions } from '@cucumber/cucumber/lib/formatter';
 import { ITestCaseAttempt } from '@cucumber/cucumber/lib/formatter/helpers/event_data_collector';
 import * as messages from '@cucumber/messages';
+import { FirstArg } from './progress-and-profile';
 
 // ts-unused-exports:disable-next-line
 export default class GithubFormatter extends SummaryFormatter {
@@ -50,5 +51,16 @@ export default class GithubFormatter extends SummaryFormatter {
     } else {
       this.log(`✅ ${testCaseTitle}\n`);
     }
+  }
+
+  logIssues(args: FirstArg<SummaryFormatter['logIssues']>): void {
+    if (
+      process.env.PICKLED_NO_WARN &&
+      args.title &&
+      args.title.includes('Warning')
+    ) {
+      return;
+    }
+    return super.logIssues(args);
   }
 }

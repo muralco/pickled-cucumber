@@ -14,3 +14,8 @@ Scenario: "abc" matches "X"
   Given A is "abc"
   When asserting that A matches "X"
   Then the assertion fails with "abc" does not match "/X/"
+
+Scenario: "0" matches ^\d+$
+  Given A is 0
+  When asserting that A matches ^\d+$
+  Then the assertion passes

@@ -1,6 +1,6 @@
 {
   "name": "pickled-cucumber",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "Cucumber test runner with several condiments",
   "main": "index.js",
   "types": "index.d.ts",
@@ -46,7 +46,7 @@
     "setup": "npm i  && npm i --no-save mongodb@2.2.27",
     "test": "./scripts/test.sh",
     "test:docker:keep": "cd docker && docker-compose run test",
-    "test:docker": "npm run test:docker:keep; cd docker && docker-compose down",
+   "test:docker": "npm run test:docker:keep; cd docker && docker-compose down",
     "watch": "tsc -w"
   }
 }

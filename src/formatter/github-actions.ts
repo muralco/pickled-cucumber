@@ -36,7 +36,7 @@ export default class GithubFormatter extends SummaryFormatter {
       return;
     }
 
-    const failed = parsed.testCase.worstTestStepResult.status != 'PASSED';
+    const passed = parsed.testCase.worstTestStepResult.status === 'PASSED';
 
     const testCaseTitle = color(
       testCaseAttempt.gherkinDocument.feature.name +
@@ -44,11 +44,8 @@ export default class GithubFormatter extends SummaryFormatter {
         testCaseAttempt.pickle.name,
     );
 
-    if (failed) {
-      this.log(`::group::❌ ${testCaseTitle}\n`);
-      this.logIssues({ issues: [testCaseAttempt], title: 'Details' });
-      this.log('::endgroup::\n');
-    } else {
+    // No need to log failures, they are in the summary
+    if (passed) {
       this.log(`✅ ${testCaseTitle}\n`);
     }
   }

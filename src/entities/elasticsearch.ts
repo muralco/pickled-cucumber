@@ -49,7 +49,6 @@ const request = async <T>(
 
 const create = <T, Tid extends keyof T>(
   indexUri: string,
-  indexSuffix: string,
   idProperty: Tid,
   opts: Options<T, Tid> = {},
 ): Entity<T, Tid> => {
@@ -81,10 +80,8 @@ const create = <T, Tid extends keyof T>(
     routing: string | undefined,
     record: IdOrObject<T, Tid>,
   ) => {
-    const uri = routing
-      ? `${indexUri}/${routing}${indexSuffix}`
-      : `${indexUri}${indexSuffix}`;
-    return `${uri}/${getId(idProperty, record)}`;
+    const uri = routing ? `${indexUri}/${routing}` : indexUri;
+    return `${uri}/_doc/${getId(idProperty, record)}`;
   };
 
   const entity: Entity<T, Tid> = {

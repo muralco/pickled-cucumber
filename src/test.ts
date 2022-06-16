@@ -60,7 +60,16 @@ if (process.env.MONGO_URI) {
 
 // === Test `entities/elasticsearch` ======================================== //
 if (ELASTIC_URI) {
-  entities['search'] = createElasticEntity(ELASTIC_URI, 'id', {
+  const indexMapping = {
+    properties: {
+      id: { type: 'long' },
+      action: { type: 'text' },
+      color: { type: 'text' },
+      created: { type: 'long' },
+      updated: { type: 'long' },
+    },
+  };
+  entities['search'] = createElasticEntity(ELASTIC_URI, indexMapping, 'id', {
     onCreate: (attrs) => ({ id: Date.now(), ...attrs, created: Date.now() }),
     onUpdate: (attrs) => ({ ...attrs, updated: Date.now() }),
   });

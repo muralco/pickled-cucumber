@@ -49,9 +49,22 @@ const request = async <T>(
 
 const create = <T, Tid extends keyof T>(
   indexUri: string,
+  indexMapping: { properties: Record<string, unknown> },
   idProperty: Tid,
   opts: Options<T, Tid> = {},
 ): Entity<T, Tid> => {
+  let indexExists = false;
+
+  const ensureIndex = async () => {
+    await request('GET', indexUri).catch(async () => {
+      await request('PUT', `${indexUri}`, {
+        mappings: indexMapping,
+      });
+    });
+
+    indexExists = true;
+  };
+
   // Refresh the index so that all operations performed since the last refresh
   // are available for search.
   // See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/indices-refresh.html
@@ -86,6 +99,10 @@ const create = <T, Tid extends keyof T>(
 
   const entity: Entity<T, Tid> = {
     create: async (attrs) => {
+      if (!indexExists) {
+        await ensureIndex();
+      }
+
       const record = opts.onCreate
         ? await opts.onCreate(attrs)
         : attrs || ({} as T);

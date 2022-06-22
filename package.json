@@ -1,6 +1,6 @@
 {
   "name": "pickled-cucumber",
-  "version": "3.3.1",
+  "version": "4.0.0",
   "description": "Cucumber test runner with several condiments",
   "main": "index.js",
   "types": "index.d.ts",
@@ -23,14 +23,13 @@
     "@typescript-eslint/parser": "4.24.0",
     "durations": "3.4.2",
     "eslint": "^7.26.0",
-    "eslint-config-mural": "1.1.0",
     "eslint-config-prettier": "8.3.0",
-    "eslint-plugin-muralco": "1.1.4",
+    "eslint-plugin-muralco": "^1.4.1",
     "eslint-plugin-prettier": "3.4.0",
     "execa": "5.0.0",
     "prettier": "2.0.5",
     "ts-unused-exports": "^7.0.3",
-    "typescript": "^3.7.3"
+    "typescript": "^3.8.3"
   },
   "dependencies": {
     "@cucumber/cucumber": "7.3.1",

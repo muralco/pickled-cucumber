@@ -34,7 +34,6 @@ export default class ProgressAndProfileFormatter extends SummaryFormatter {
     } = testCaseAttempt;
 
     const parsed = formatterHelpers.parseTestCaseAttempt({
-      cwd: this.cwd,
       snippetBuilder: this.snippetBuilder,
       supportCodeLibrary: this.supportCodeLibrary,
       testCaseAttempt,

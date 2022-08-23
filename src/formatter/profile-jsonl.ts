@@ -21,11 +21,11 @@ export default class ProfileJsonlFormatter extends SummaryFormatter {
     );
     const {
       gherkinDocument,
-      worstTestStepResult: { status, willBeRetried },
+      worstTestStepResult: { status },
+      willBeRetried,
     } = testCaseAttempt;
 
     const parsed = formatterHelpers.parseTestCaseAttempt({
-      cwd: this.cwd,
       snippetBuilder: this.snippetBuilder,
       supportCodeLibrary: this.supportCodeLibrary,
       testCaseAttempt,

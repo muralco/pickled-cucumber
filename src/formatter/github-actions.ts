@@ -22,7 +22,6 @@ export default class GithubFormatter extends SummaryFormatter {
     );
 
     const parsed = formatterHelpers.parseTestCaseAttempt({
-      cwd: this.cwd,
       snippetBuilder: this.snippetBuilder,
       supportCodeLibrary: this.supportCodeLibrary,
       testCaseAttempt,

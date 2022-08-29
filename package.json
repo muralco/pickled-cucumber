@@ -1,12 +1,17 @@
 {
   "name": "pickled-cucumber",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "description": "Cucumber test runner with several condiments",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/muralco/pickled-cucumber.git"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./*": "./dist/*.js",
+    "./**/*": "./dist/**/*.js"
   },
   "author": "MURAL",
   "license": "MIT",
@@ -36,12 +41,17 @@
     "node-fetch": "^2.2.0",
     "ts-node": "^7.0.0"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "npm run lint && tsc",
-    "dist": "rm -rf dist && npm run build && npm run test && cp package*.json README.md LICENSE dist && rm dist/test.*",
+    "dist": "rm -rf dist && npm run build && npm run test && rm dist/test.*",
     "lint": "eslint . && ts-unused-exports tsconfig.json",
     "lint:fix": "eslint --fix .",
-    "pack": "npm run dist && cd dist && npm pack",
+    "pack": "npm run dist && npm pack",
     "setup": "npm i  && npm i --no-save mongodb@2.2.27",
     "test": "./scripts/test.sh",
     "test:docker:keep": "cd docker && docker-compose run test",

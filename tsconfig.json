@@ -13,7 +13,6 @@
     "alwaysStrict": true,
     "declaration": true,
     "sourceMap": true,
-    "baseUrl": "./src",
     "resolveJsonModule": true
   },
   "include": [

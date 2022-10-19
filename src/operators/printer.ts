@@ -22,14 +22,19 @@ export default (ops: OperatorMap): string => {
     .join('');
 };
 
-const prettyJson = (o: unknown, p = '') =>
-  `${JSON.stringify(o, undefined, 2)}`.replace(/\n/g, `\n${p}`);
+const prettyJson = (o: unknown, p = '', i = 0) => {
+  try {
+    return `${JSON.stringify(o, undefined, i)}`.replace(/\n/g, `\n${p}`);
+  } catch (e) {
+    return `Can't convert object to string`;
+  }
+};
 
 const assertValue = (v: unknown) =>
-  v === undefined ? 'undefined' : JSON.stringify(v);
+  v === undefined ? 'undefined' : prettyJson(v);
 
 const printValue = (o: unknown) =>
-  typeof o === 'object' ? JSON.stringify(o) : `${o}`;
+  typeof o === 'object' ? prettyJson(o) : `${o}`;
 
 export const printError = ({
   actual,
@@ -47,6 +52,7 @@ export const printError = ({
   const actualValue = subError ? subError.actual : actual;
   const expectedValue = subError ? subError.expected : expected;
   const padd = '    ';
+  const indent = 2;
 
   const fullActual = full || (subError && actual);
 
@@ -54,20 +60,20 @@ export const printError = ({
 
   const message = `
   Error${at}:
-    ${JSON.stringify(actualValue)} ${errorMessage}${
+    ${prettyJson(actualValue)} ${errorMessage}${
     !unary ? ` ${printValue(expectedValue)}` : ''
   }
   \n\n
   Actual${at}:
-    ${prettyJson(actualValue, padd)}
+    ${prettyJson(actualValue, padd, indent)}
   Expected:
-    ${prettyJson(expectedValue, padd)}
+    ${prettyJson(expectedValue, padd, indent)}
 
   ${
     fullActual
       ? `
   Full actual object:
-    ${prettyJson(fullActual, padd)}
+    ${prettyJson(fullActual, padd, indent)}
   `
       : ''
   }

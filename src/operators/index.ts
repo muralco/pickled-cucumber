@@ -3,6 +3,7 @@ import opDoesNotExist from './negative/does-not-exist';
 import opDoesNotHaveKeys from './negative/does-not-have-keys';
 import opDoesNotMatch from './negative/does-not-match';
 import opIsNot from './negative/is-not';
+import opApproximates from './positive/approximates';
 import opContains from './positive/contains';
 import opExists from './positive/exists';
 import opHasKeys from './positive/has-keys';
@@ -25,6 +26,7 @@ const OPERATORS = [
   opIsNot,
   opMatches,
   opStartsWith,
+  opApproximates,
 ].reduce<OperatorMap>((acc, op) => {
   if (typeof op.name === 'string') acc[op.name] = op;
   else op.name.forEach((name) => (acc[name] = op));

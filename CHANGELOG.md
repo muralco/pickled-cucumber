@@ -5,8 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-## [2.1.1] - YYYY-MM-DD
+## [6.1.1] - YYYY-MM-DD
 
+## [6.1.0] - 2022-12-01
+### Added
+  - Add new `approximates` operator for better floating point comparisons which allows to specify error margin. e.g. `N approximates 7.5 +- 0.1`
+
+## [6.0.0] - ????-??-??
+  - ???
+  
+## [2.1.1] - YYYY-MM-DD
 ### Added
   - redis entities adapter
   - documentation on how to extend operators

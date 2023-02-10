@@ -1,0 +1,35 @@
+name: Build
+on:
+  push:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: 'ubuntu-latest' 
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x.x'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install deps
+        run: |
+          npm ci
+
+      - name: Build and test 
+        run: |
+          npm run dist
+
+      - name: Publish 
+        if: ${{github.ref == 'refs/heads/master'}}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm publish
+
+

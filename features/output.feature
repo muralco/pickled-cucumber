@@ -63,9 +63,9 @@ Scenario: Capture enabled and suppression disabled
   """
   .logged-on-initial-context-stdout
   .Hello world
-  ......logged-on-initial-context-stdout
+  .....logged-on-initial-context-stdout
   .Hello world
-  ..F..
+  ..F.
 
   Failures:
 
@@ -90,7 +90,6 @@ Scenario: Capture enabled and suppression disabled
          logged-on-initial-context-stdout
          Hello world
 
-     ✔ After
      ✔ After
 
   2 scenarios (1 failed, 1 passed)
@@ -110,7 +109,7 @@ Scenario: Capture enabled and suppression enabled
   When the suite is executed
   Then stdout contains
   """
-  ...........F..
+  ..........F.
 
   Failures:
 
@@ -136,7 +135,6 @@ Scenario: Capture enabled and suppression enabled
          Hello world
 
      ✔ After
-     ✔ After
 
   2 scenarios (1 failed, 1 passed)
   6 steps (1 failed, 5 passed)
@@ -150,7 +148,7 @@ Scenario: Capture disabled and suppression enabled
   When the suite is executed
   Then stdout contains
   """
-  ...........F..
+  ..........F.
 
   Failures:
 
@@ -161,7 +159,6 @@ Scenario: Capture disabled and suppression enabled
      ✔ And message Bye Bye is written to stderr
      ✖ Then error
          Error: Error
-     ✔ After
      ✔ After
 
   2 scenarios (1 failed, 1 passed)

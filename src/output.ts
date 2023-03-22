@@ -1,10 +1,4 @@
-import {
-  After,
-  AfterStep,
-  Before,
-  BeforeStep,
-  Status,
-} from '@cucumber/cucumber';
+import { AfterStep, Before, BeforeStep, Status } from '@cucumber/cucumber';
 import {
   AfterInitialContext,
   AfterTeardown,
@@ -95,7 +89,7 @@ export const setupOutputCapture = (
   AfterTeardown(restore);
   AfterStep(restore);
 
-  After(({ result }) => {
+  AfterStep(({ result }) => {
     if (capture && result && result.status === Status.FAILED) {
       result.message += [
         '',

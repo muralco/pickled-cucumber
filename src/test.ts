@@ -185,6 +185,13 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
     assert.equal(getCtx(name), val),
   );
 
+  // === Test parser ===================================================== //
+  Then(
+    'JSON representation of the payload is (.*)',
+    (repr, payload) => assert.equal(repr, JSON.stringify(payload)),
+    { parser: 'json5' },
+  );
+
   // === Test output ======================================================== //
   Given('step definition', (payload) => setCtx('steps-definition', payload));
   Given('feature file is', (payload) =>

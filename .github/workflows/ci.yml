@@ -1,8 +1,9 @@
 name: Build
 on:
-  push: {}
-  pull_request:
-    types: [opened, reopened]
+  push: 
+    branches: 
+      - master
+  pull_request: {}
 
 concurrency:
   group: ci-${{ github.ref }}

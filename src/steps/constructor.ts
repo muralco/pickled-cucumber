@@ -1,7 +1,19 @@
+import JSON5 from 'json5';
 import BUILT_IN_ALIASES from '../aliases';
 import { Aliases, Context } from '../types';
 import { getDeep } from '../util';
-import { Step, StepFn, StepKind, StepOptions } from './types';
+import {
+  ParserFn,
+  ParserKind,
+  Step,
+  StepFn,
+  StepKind,
+  StepOptions,
+} from './types';
+
+const PARSER_MAP: Record<ParserKind, ParserFn> = {
+  json: JSON5.parse,
+} as const;
 
 const getDeepString = (ctx: Context, path: string): string => {
   const v = getDeep(ctx, path);
@@ -27,16 +39,30 @@ const resolveRegExp = (aliases: Aliases, regexpString: string) =>
   );
 
 // Creates a proxy of fn that calls `expand` on every argument
-const proxyFnFor = (getCtx: () => Context, fn: StepFn, argCount: number) => {
-  // tslint:disable-next-line prefer-array-literal
-  const args = new Array(argCount).fill(undefined).map((_, i) => `a${i}`);
-  const body = `{
-    const { fn, expand } = this;
-    const ex = expand(this.getCtx());
-    return fn(${args.map((a) => `ex(${a})`).join(',')});
-  }`;
-  // tslint:disable-next-line no-function-constructor-with-string-args
-  return new Function(...args, body).bind({ getCtx, expand, fn });
+const proxyFnFor = (
+  getCtx: () => Context,
+  fn: StepFn,
+  argCount: number,
+  parserFn?: ParserFn,
+) => {
+  // this will convert the variadic args to a fixed-length function
+  // which is used internally to run the actual step definition
+  const proxyFn = (...args: string[]) => {
+    // reverse the args list handle the `payload` arg
+    const ex = expand(getCtx());
+    const [errorFn, ...fnArgs] = args.reverse();
+    const [tail, ...head] = fnArgs.map(ex);
+    const parse = parserFn ? parserFn : (x: string) => x;
+
+    const proxyArgs = [...head.reverse(), parse(tail) as any, errorFn];
+    return fn.call(null, ...proxyArgs.slice(0, argCount));
+  };
+
+  // we are using this internally to differenciate the function kind
+  // this makes the 'proxyFn' mimic a N-args function just fine
+  Object.defineProperty(proxyFn, 'length', { get: () => argCount });
+
+  return proxyFn;
 };
 
 // Generates a cucumber step, with some additional features:
@@ -56,6 +82,9 @@ const proxyFnFor = (getCtx: () => Context, fn: StepFn, argCount: number) => {
 //   version of the step that does not include the last argument. Also, when
 //   `optional` is a string, that string is appended to all other version of
 //    this step. Note that setting `optional` implies `inline`
+//
+// - setting `opt.parser` will automatically add a payload parser before sending
+//   the payload to your step definition handler; currently 'json' is available
 export default (aliases: Aliases, getCtx: () => Context) => (
   kind: StepKind,
   regexpString: string,
@@ -63,8 +92,12 @@ export default (aliases: Aliases, getCtx: () => Context) => (
   opt: StepOptions = {},
 ): Step[] => {
   // Generate a proxy of fn that calls `expand` on every argument
-  const proxyFn = proxyFnFor(getCtx, fn, fn.length);
-
+  const proxyFn = proxyFnFor(
+    getCtx,
+    fn,
+    fn.length,
+    opt.parser ? PARSER_MAP[opt.parser] : undefined,
+  );
   const allAliases = { ...BUILT_IN_ALIASES, ...aliases };
 
   const rawRegExp = resolveRegExp(allAliases, regexpString);
@@ -80,6 +113,7 @@ export default (aliases: Aliases, getCtx: () => Context) => (
       fn,
       fn.length - 1 - (suffix.match(/(\([^)]*\))/g) || []).length,
     );
+
     steps.push({
       fn: proxyFnWithoutLastArg,
       kind,

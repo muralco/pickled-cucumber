@@ -21,6 +21,7 @@ export default class ProgressAndProfileFormatter extends SummaryFormatter {
       }
     });
   }
+
   public logTestCaseFinished(
     testCaseFinished: messages.TestStepFinished,
   ): void {

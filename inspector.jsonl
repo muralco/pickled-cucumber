@@ -1,0 +1,5 @@
+{"testCaseStartedId":"482055d2-22d9-412a-b83f-c7d165fc57cb","testStepStartedId":"3021838b-a77f-4cea-b83e-19805e281b28","diff":[{"path":["initialFive"],"type":"CHANGE","value":5}]}
+{"testCaseStartedId":"11cf2dc2-ed95-4b30-af7f-2fa9b14e06fc","testStepStartedId":"48f35908-e451-4173-872f-24fc74b2752a","diff":[{"path":["initialFive"],"type":"CHANGE","value":6,"oldValue":5}]}
+{"testCaseStartedId":"49539338-d366-4a07-9a57-e0e88ee9a19c","testStepStartedId":"8871679e-c3d1-4eab-b576-d2f7decf89a4","diff":[{"path":["initialFive"],"type":"CHANGE","value":5,"oldValue":6}]}
+{"testCaseStartedId":"49539338-d366-4a07-9a57-e0e88ee9a19c","testStepStartedId":"040a5b24-0df2-4dec-89c3-60369bc2001b","diff":[{"path":["initialFive"],"type":"CHANGE","value":6,"oldValue":5}]}
+{"testCaseStartedId":"b47bbb6b-e428-4aeb-b755-b6eea581e7cb","testStepStartedId":"1d6e893e-5585-445a-8a00-8f2990b0026f","diff":[{"path":["initialFive"],"type":"CHANGE","value":5,"oldValue":6}]}

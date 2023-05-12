@@ -13,6 +13,7 @@ export default class ProfileJsonlFormatter extends SummaryFormatter {
       }
     });
   }
+
   public logTestCaseFinished(
     testCaseFinished: messages.TestStepFinished,
   ): void {

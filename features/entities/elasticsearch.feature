@@ -17,6 +17,12 @@ Scenario: assert by property
   Given a search S with { "color": "red", "action": "${random}" }
   Then the document for the search with { "query": { "term": { "action": "${random}" } } } at color is "red"
 
+Scenario: assert many by property
+  Given a search S with { "color": "red", "action": "${random}" }
+  And a search S2 with { "color": "orange", "action": "${random}" }
+  Then the documents for the search with { "query": { "term": { "action": "${random}" } } } includes { "color": "red" }
+  And the documents for the search with { "query": { "term": { "action": "${random}" } } } includes { "color": "orange" }
+
 Scenario: store document variable
   Given a search S with { "color": "red", "action": "${random}" }
   And store the document for search S in U2

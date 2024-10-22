@@ -3,6 +3,8 @@ import { getId } from './util';
 
 type Criteria<T, Tid extends keyof T> = { [id: string]: T[Tid] } | Partial<T>;
 
+type FindCursor<T> = { toArray(): Promise<T[]> };
+
 interface Changes<T> {
   $push?: { [k in keyof T]?: T[k][] };
   $set?: Partial<T>;
@@ -18,6 +20,7 @@ interface MongoClient {
     deleteOne: (criteria: Criteria<T, Tid>) => Void;
     insertOne: (o: T) => Void;
     findOne: (criteria: Criteria<T, Tid>) => Promise<T | null>;
+    find: (criteria: Criteria<T, Tid>) => FindCursor<T>;
     updateOne: (Criteria: Criteria<T, Tid>, changes: Changes<T>) => Void;
   }>;
 }
@@ -50,12 +53,20 @@ const create = <T, Tid extends keyof T>(
       });
     },
     findBy: async (criteria) => {
-      if (!criteria) {
+      if (!criteria || typeof criteria !== 'object') {
         throw new Error('MongoEntity::findBy: criteria must be an object');
       }
       const db = await getDb();
       const collection = await db.collection<T, Tid>(collectionName);
       return collection.findOne(criteria);
+    },
+    find: async (criteria) => {
+      if (!criteria || typeof criteria !== 'object') {
+        throw new Error('MongoEntity::find: criteria must be an object');
+      }
+      const db = await getDb();
+      const collection = await db.collection<T, Tid>(collectionName);
+      return collection.find(criteria).toArray();
     },
     findById: (idOrObject) =>
       entity.findBy({

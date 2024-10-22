@@ -21,6 +21,16 @@ const generate = <T, Tid extends keyof T>(
       entities.splice(entities.findIndex((e) => e === entity, 1));
     },
     // eslint-disable-next-line @typescript-eslint/ban-types
+    find: async (record: object) => {
+      const entries = Object.entries(record) as Entries;
+      return entities.filter(
+        (e) =>
+          entries.every((pair) => e[pair[0]] === pair[1]) ||
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (idField in record && e[idField] === (record as any)[idField]),
+      );
+    },
+    // eslint-disable-next-line @typescript-eslint/ban-types
     findBy: async (record: object) => {
       const entries = Object.entries(record) as Entries;
       return entities.find(

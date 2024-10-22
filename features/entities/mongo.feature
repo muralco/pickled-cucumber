@@ -17,6 +17,12 @@ Scenario: assert by property
   Given a user U with { "color": "red", "action": "${random}" }
   Then the document for the user with { "action": "${random}" } at color is "red"
 
+Scenario: assert many by property
+  Given a user U with { "color": "red", "action": "${random}" }
+  And a user U2 with { "color": "blue", "action": "${random}" }
+  Then the documents for the user with { "action": "${random}" } includes { "color": "red" }
+  And the documents for the user with { "action": "${random}" } includes { "color": "blue" }
+
 Scenario: store document variable
   Given a user U with { "color": "red", "action": "${random}" }
   And store the document for user U in U2

@@ -4,6 +4,8 @@ export interface Entity<T, Tid extends keyof T> {
   create: (attrs?: T) => Promise<T>;
   delete: (idOrObject: IdOrObject<T, Tid>) => Promise<void>;
   // eslint-disable-next-line
+  find: (criteria: object) => Promise<T[]>;
+  // eslint-disable-next-line
   findBy: (criteria: object) => Promise<T | undefined | null>;
   findById: (idOrObject: IdOrObject<T, Tid>) => Promise<T | undefined | null>;
   update: (idOrObject: IdOrObject<T, Tid>, attrs: Partial<T>) => Promise<T>;

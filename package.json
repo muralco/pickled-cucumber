@@ -1,6 +1,6 @@
 {
   "name": "pickled-cucumber",
-  "version": "6.2.0",
+  "version": "6.3.0",
   "description": "Cucumber test runner with several condiments",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -34,7 +34,7 @@
     "execa": "5.0.0",
     "prettier": "2.0.5",
     "ts-unused-exports": "^7.0.3",
-    "typescript": "^3.8.3"
+    "typescript": "4.3"
   },
   "dependencies": {
     "@cucumber/cucumber": "8.5.1",
@@ -53,7 +53,7 @@
     "lint": "eslint . && ts-unused-exports tsconfig.json",
     "lint:fix": "eslint --fix .",
     "pack": "npm run dist && npm pack",
-    "setup": "npm i  && npm i --no-save mongodb@2.2.27",
+    "setup": "npm i  && npm i --no-save mongodb@5.8.1",
     "test": "./scripts/test.sh",
     "test:docker:keep": "cd docker && docker-compose run test",
     "test:docker": "npm run test:docker:keep; cd docker && docker-compose down",

@@ -16,7 +16,10 @@ services:
       - ../src:/usr/src/src
 
   elasticsearch:
-    image: elasticsearch:2.2.0
+    image: elasticsearch:7.16.3
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
 
   mongodb:
     image: mongo:latest

@@ -83,11 +83,15 @@ const create = <T, Tid extends keyof T>(
       `${indexUri}/_search`,
       criteria,
     );
-    return docs.hits.hits[0];
+    return docs.hits.hits;
   };
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  const searchOne = async (criteria: object) => (await search(criteria))[0];
+
   const getSource = (doc: Doc<T> | undefined) => doc && doc._source;
+  const getSources = (docs: Doc<T>[]) => docs.map((doc) => doc._source);
   const getById = (idOrObject: T | T[Tid]) =>
-    search({ query: { term: { _id: `${getId(idProperty, idOrObject)}` } } });
+    searchOne({ query: { term: { _id: `${getId(idProperty, idOrObject)}` } } });
 
   const getRecordUri = (
     routing: string | undefined,
@@ -118,7 +122,8 @@ const create = <T, Tid extends keyof T>(
       await request('DELETE', getRecordUri(doc._routing, doc._source));
       await refresh();
     },
-    findBy: async (criteria) => getSource(await search(criteria)),
+    find: async (criteria) => getSources(await search(criteria)),
+    findBy: async (criteria) => getSource(await searchOne(criteria)),
     findById: async (idOrObject) => getSource(await getById(idOrObject)),
     update: async (idOrObject, attrs) => {
       const id = getId(idProperty, idOrObject);

@@ -51,6 +51,14 @@ const setup = (
     { inline: true },
   );
   Then(
+    'the documents for the {entity} with (\\{.*\\}) {op}',
+    async (entity, query, op, payload) => {
+      const docs = await entities[entity].find(JSON.parse(query));
+      compare(op, docs, payload);
+    },
+    { inline: true },
+  );
+  Then(
     'that document {op}',
     (op, payload) => compare(op, getCtx('$last-doc'), payload),
     { inline: true },

@@ -8,7 +8,7 @@ waitFor() {
     if [ $? -eq 0 ]; then echo "OK"; exit 0; fi
     I=$((I-1))
     if [ $I -eq 0 ]; then echo "Gave up"; exit 1; fi
-    sleep 1
+    sleep 5
     echo -n .
   done
 }

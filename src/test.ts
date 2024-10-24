@@ -4,7 +4,6 @@ import execa from 'execa';
 import fs from 'fs';
 import nodeFetch from 'node-fetch';
 import path from 'path';
-import { promisify } from 'util';
 import compareJson from './compare-json';
 import createElasticEntity from './entities/elasticsearch';
 import createMemoryEntity from './entities/memory';
@@ -40,13 +39,13 @@ if (process.env.MONGO_URI) {
   let connected = false;
 
   const getDb = async () => {
-    if (client) return client;
+    if (client) return client.db();
 
-    client = promisify(mongo.MongoClient.connect)(process.env.MONGO_URI);
+    const conn = new mongo.MongoClient(process.env.MONGO_URI);
+    client = await conn.connect();
 
-    await client;
     connected = true;
-    return client;
+    return client.db();
   };
   AfterAll(async () => {
     if (connected) (await client).close();

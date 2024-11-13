@@ -1,6 +1,6 @@
 {
   "name": "pickled-cucumber",
-  "version": "6.3.0",
+  "version": "6.3.1",
   "description": "Cucumber test runner with several condiments",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,6 +10,13 @@
   },
   "exports": {
     ".": "./dist/index.js",
+    "./aliases": "./dist/aliases/index.js",
+    "./entities": "./dist/entities/index.js",
+    "./formatter": "./dist/formatter/index.js",
+    "./http": "./dist/http/index.js",
+    "./misc": "./dist/misc/index.js",
+    "./operators": "./dist/operators/index.js",
+    "./steps": "./dist/steps/index.js",
     "./*": "./dist/*.js",
     "./**/*": "./dist/**/*.js"
   },
@@ -42,11 +49,7 @@
     "node-fetch": "^2.2.0",
     "ts-node": "^7.0.0"
   },
-  "files": [
-    "dist/",
-    "README.md",
-    "LICENSE"
-  ],
+  "files": ["dist/", "README.md", "LICENSE"],
   "scripts": {
     "build": "npm run lint && tsc",
     "dist": "rm -rf dist && npm run build && npm run test && rm dist/test.*",

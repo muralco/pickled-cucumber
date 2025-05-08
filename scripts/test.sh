@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ELASTIC=http://localhost:9200
-MONGO=mongodb://localhost:27017/test
+MONGO=mongodb://localhost:27017/test?directConnection=true
 
 cd $(dirname $0)/..
 

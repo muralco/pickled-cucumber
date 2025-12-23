@@ -201,8 +201,7 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
 
     await writeFile(featureFile, getCtx('feature-file-content'));
 
-    const testOptions: Options = {
-    };
+    const testOptions: Options = {};
 
     // Asume they define fn
     const stepsContent = `

@@ -60,7 +60,6 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
     usage,
   } = options;
 
-
   const getTearDown = () => getCtxItem<TearDownFn[]>('$tearDown');
   if (!process.env.KEEP_DATA) {
     After(async () => {

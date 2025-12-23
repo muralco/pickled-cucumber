@@ -192,7 +192,7 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
 
     const testOptions: Options = {};
 
-    // Asume they define fn
+    // Assume they define fn
     const stepsContent = `
 import setup, { SetupFn } from '../src/index';
 

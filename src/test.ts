@@ -80,7 +80,6 @@ const options: Options = {
     '/api/*': /\/api\/.*/,
     'proper-name': /[A-Z][a-z]*/,
   },
-  captureOutput: true,
   elasticSearchIndexUri: ELASTIC_URI,
   entities,
   http: httpFetch(nodeFetch),
@@ -95,7 +94,6 @@ const options: Options = {
   requireMocks: {
     'totally-random-module': 42,
   },
-  suppressOutput: true,
   usage: true,
 };
 
@@ -196,10 +194,6 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
   Given('feature file is', (payload) =>
     setCtx(`feature-file-content`, payload),
   );
-  Given('stdio output is suppressed', () =>
-    setCtx(`suppression-enabled`, true),
-  );
-  Given('stdio output is captured', () => setCtx(`capture-enabled`, true));
   When('the suite is executed', async () => {
     const testDir = await mkdtemp(`output-test-`);
     const featureFile = path.join(testDir, 'test-feature.feature');
@@ -208,8 +202,6 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
     await writeFile(featureFile, getCtx('feature-file-content'));
 
     const testOptions: Options = {
-      captureOutput: getCtx<boolean | undefined>('capture-enabled'),
-      suppressOutput: getCtx<boolean | undefined>('suppression-enabled'),
     };
 
     // Asume they define fn

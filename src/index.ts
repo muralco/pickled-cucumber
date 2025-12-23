@@ -15,12 +15,6 @@ import compareJson from './compare-json';
 import { getCtx, getCtxItem, pushCtxItem, setCtx, setCtxItem } from './context';
 import setupEntities from './entities';
 import { defineElasticSteps } from './entities/elasticsearch';
-import {
-  triggerAfterInitialContext,
-  triggerAfterTeardown,
-  triggerBeforeInitialContext,
-  triggerBeforeTeardown,
-} from './hooks';
 import setupHttp from './http';
 import setupMisc from './misc';
 import { getOpSpec } from './operators';
@@ -63,16 +57,11 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
   const getTearDown = () => getCtxItem<TearDownFn[]>('$tearDown');
   if (!process.env.KEEP_DATA) {
     After(async () => {
-      triggerBeforeTeardown();
-      try {
-        await Promise.all(
-          getTearDown()
-            .reverse()
-            .map((fn) => fn()),
-        );
-      } finally {
-        triggerAfterTeardown();
-      }
+      await Promise.all(
+        getTearDown()
+          .reverse()
+          .map((fn) => fn()),
+      );
     });
   }
 
@@ -80,7 +69,6 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
 
   Before(($scenario) => {
     // Execute before initial context hook
-    triggerBeforeInitialContext();
     const customCtx =
       (options.initialContext && options.initialContext()) || {};
     setCtx({
@@ -90,7 +78,6 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
       $tearDown: [],
     });
     // Execute after initial context hook
-    triggerAfterInitialContext();
   });
 
   const entityNames = Object.keys(entities);

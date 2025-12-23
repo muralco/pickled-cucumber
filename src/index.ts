@@ -19,7 +19,6 @@ import setupHttp from './http';
 import setupMisc from './misc';
 import { getOpSpec } from './operators';
 import printOperators, { printError } from './operators/printer';
-import setupRequireMock from './require';
 import stepCtor from './steps/constructor';
 import printSteps from './steps/printer';
 import { Step, StepKind } from './steps/types';
@@ -49,7 +48,6 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
     entities = {},
     http,
     operators = {},
-    requireMocks,
     timeout,
     usage,
   } = options;
@@ -105,8 +103,8 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
     AfterAll,
     AfterStep,
     Before,
-    BeforeAll,
     BeforeStep,
+    BeforeAll,
     compare: (op, a, e) => {
       const error = compareJson(operators, op, a, e);
       if (error !== undefined) printError(error);
@@ -121,7 +119,6 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
   };
 
   setupMisc(args);
-  if (requireMocks) setupRequireMock(requireMocks);
   if (hasEntities) setupEntities(entities, args);
   if (elasticSearchIndexUri) defineElasticSteps(elasticSearchIndexUri, args);
   if (http) setupHttp(http, args);

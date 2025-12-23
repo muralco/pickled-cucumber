@@ -12,10 +12,6 @@ export interface Aliases {
   [name: string]: RegExp;
 }
 
-export interface RequireMockMap {
-  [module: string]: unknown;
-}
-
 export interface Options {
   aliases?: Aliases;
   elasticSearchIndexUri?: string;
@@ -23,7 +19,6 @@ export interface Options {
   http?: HttpFn;
   initialContext?: () => Context;
   operators?: OperatorMap;
-  requireMocks?: RequireMockMap;
   timeout?: number;
   usage?: boolean;
 }

@@ -91,21 +91,10 @@ const options: Options = {
     },
     initialFive: 5,
   }),
-  requireMocks: {
-    'totally-random-module': 42,
-  },
   usage: true,
 };
 
 const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
-  // === Test `requireMocks` ================================================ //
-  assert.equal(
-    // eslint-disable-next-line
-    require('totally-random-module'),
-    42,
-    'Require mocks are not working',
-  );
-
   // === Test `compareJson` and `aliases` =================================== //
   const getResult = () => getCtx<CompareError>('$result');
 

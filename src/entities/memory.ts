@@ -6,7 +6,11 @@ const generate = <T, Tid extends keyof T>(
 ): Entity<T, Tid> => {
   const entities: T[] = [];
 
-  const isObj = (v: IdOrObject<T, Tid>): v is T => v && idField in v;
+  const isObj = (v: IdOrObject<T, Tid>): v is T =>
+    typeof v === 'object' &&
+    v !== null &&
+    idField in (v as Record<PropertyKey, unknown>);
+
   type Entries = [keyof T, T[keyof T]][];
 
   const entityMethods: Entity<T, Tid> = {
@@ -44,8 +48,14 @@ const generate = <T, Tid extends keyof T>(
       const id = isObj(record) ? record[idField] : record;
       return entityMethods.findBy({ [idField]: id });
     },
-    update: async (record, update) => {
+    update: async (
+      record: IdOrObject<T, Tid>,
+      update: Partial<T>,
+    ): Promise<T> => {
       const entity = await entityMethods.findById(record);
+      if (entity === null || entity === undefined) {
+        throw new Error('Trying to update inexistent record');
+      }
       return Object.assign(entity, update);
     },
   };

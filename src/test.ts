@@ -221,61 +221,29 @@ setup(fn, {
 
     await writeFile(stepsFile, stepsContent);
 
-    try {
-      const output = await execa(
-        './node_modules/.bin/cucumber-js',
-        [
-          '--publish-quiet',
-          '--require-module',
-          'ts-node/register',
-          '-r',
-          stepsFile,
-          featureFile,
-        ],
-        {
-          env: {
-            TS_NODE_CACHE: 'false',
-            TS_NODE_FILES: 'true',
-          },
+    await execa(
+      './node_modules/.bin/cucumber-js',
+      [
+        '--publish-quiet',
+        '--require-module',
+        'ts-node/register',
+        '-r',
+        stepsFile,
+        featureFile,
+      ],
+      {
+        env: {
+          TS_NODE_CACHE: 'false',
+          TS_NODE_FILES: 'true',
         },
-      );
-      setCtx('test-suite-stdout', output.stdout);
-      setCtx('test-suite-stderr', output.stderr);
-    } catch (error) {
-      // Test suite can fail
-      setCtx('test-suite-stdout', error.stdout);
-      setCtx('test-suite-stderr', error.stderr);
-    }
+      },
+    );
 
     onTearDown(async () => {
       if (testDir) {
         await rmdir(testDir, { recursive: true });
       }
     });
-  });
-  Then('stdout contains', (payload) => {
-    const output = getCtx<string>('test-suite-stdout');
-    // Remove last line (used to report status because has timings
-    const filtered = output
-      .split('\n')
-      .map((line) => line.split(' #')[0])
-      .filter((line) => {
-        // Remove last line (used to report status because has timings)
-        if (line.includes('s (executing steps: ')) {
-          return false;
-        }
-        // Remove information from exceptions
-        if (line.startsWith('           at ')) {
-          return false;
-        }
-        return true;
-      })
-      .join('\n');
-    assert.deepEqual(payload, filtered);
-  });
-  Then('stderr contains', (payload) => {
-    const output = getCtx<string>('test-suite-stderr');
-    assert.deepEqual(payload, output);
   });
 };
 

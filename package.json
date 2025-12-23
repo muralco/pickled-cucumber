@@ -56,7 +56,7 @@
     "lint": "eslint . && ts-unused-exports tsconfig.json",
     "lint:fix": "eslint --fix .",
     "pack": "npm run dist && npm pack",
-    "setup": "npm i  && npm i --no-save mongodb@5.8.1",
+    "setup": "npm i  && npm i --no-save mongodb@6.16",
     "test": "./scripts/test.sh",
     "test:docker:keep": "cd docker && docker-compose run test",
     "test:docker": "npm run test:docker:keep; cd docker && docker-compose down",

@@ -455,70 +455,6 @@ documentation in a separate place, see:
 
 > [Entities Module](docs/entities.md#entities-module).
 
-### Output Module
-
-The _output module_ enables capture and suppression of stdout and stderr when tests are runned.
-
-To enable the _output module_ you have the following options:
-
-```js
-const options = {
-  captureOutput: true  // Will present captured stdout and stderr if an step fails
-  suppressOutput: true  // Will hide stdout and stderr emitted by each step
-};
-
-const fn = (args) => {
-  // define your steps here using args
-}
-
-setup(fn, options);
-```
-
-Reported output will be like the following example (only if a test fails):
-```
-Failures:
-
-1) Scenario: { "a": 1 } at a is 2 # features/operators/at.feature:8
-   ✔ Before # src/index.ts:62
-   ✔ Before # src/output.ts:47
-   ✔ Given A is { "a": 1 } # src/index.ts:144
-   ✔ When asserting that A at a is 2 # src/index.ts:146
-   ✔ Then the assertion fails with 1 is not 2 # src/index.ts:145
-   ✖ And the full actual value is { "a": 7} # src/index.ts:145
-       AssertionError [ERR_ASSERTION] [ERR_ASSERTION]: Expected values to be loosely deep-equal:
-
-       {
-         a: 7
-       }
-
-       should loosely deep-equal
-
-       {
-         a: 1
-       }
-           + expected - actual
-
-            {
-           -  "a": 7
-           +  "a": 1
-            }
-
-           at Then.inline (pickled-cucumber/src/test.ts:127:22)
-           at Object.eval (eval at proxyFnFor (pickled-cucumber/src/steps/constructor.ts:48:32), <anonymous>:6:12)
-
-       Captured Output
-       ===============
-       Std Err
-       -------
-       <Nothing was captured>
-
-       Std Out
-       -------
-       If your are seing this tests are broken
-```
-#### Caveats
-Deprecation warnings, and output emitted from `v8` or `c++` modules will not be captured.
-
 ### Formatters
 
 You can use the custom formatter by adding:
@@ -534,10 +470,6 @@ Valid formatters are:
 
 
 ### Operators Module
-
-TBD
-
-### `require` mocks
 
 TBD
 

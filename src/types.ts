@@ -12,20 +12,13 @@ export interface Aliases {
   [name: string]: RegExp;
 }
 
-export interface RequireMockMap {
-  [module: string]: unknown;
-}
-
 export interface Options {
   aliases?: Aliases;
-  captureOutput?: boolean;
   elasticSearchIndexUri?: string;
   entities?: EntityMap;
   http?: HttpFn;
   initialContext?: () => Context;
   operators?: OperatorMap;
-  requireMocks?: RequireMockMap;
-  suppressOutput?: boolean;
   timeout?: number;
   usage?: boolean;
 }

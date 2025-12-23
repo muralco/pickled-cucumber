@@ -1,6 +1,6 @@
 {
   "name": "pickled-cucumber",
-  "version": "6.3.1",
+  "version": "7.0.0",
   "description": "Cucumber test runner with several condiments",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -28,7 +28,7 @@
   "homepage": "https://github.com/muralco/pickled-cucumber",
   "devDependencies": {
     "@types/lodash": "4.14.168",
-    "@types/node": "^12.12.14",
+    "@types/node": "^22.9.0",
     "@types/node-fetch": "^2.1.2",
     "@types/progress": "2.0.3",
     "@typescript-eslint/eslint-plugin": "4.24.0",
@@ -41,15 +41,19 @@
     "execa": "5.0.0",
     "prettier": "2.0.5",
     "ts-unused-exports": "^7.0.3",
-    "typescript": "4.3"
+    "typescript": "5.9"
   },
   "dependencies": {
-    "@cucumber/cucumber": "8.5.1",
+    "@cucumber/cucumber": "^12.4.0",
     "json5": "^2.2.3",
     "node-fetch": "^2.2.0",
     "ts-node": "^7.0.0"
   },
-  "files": ["dist/", "README.md", "LICENSE"],
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "npm run lint && tsc",
     "dist": "rm -rf dist && npm run build && npm run test && rm dist/test.*",

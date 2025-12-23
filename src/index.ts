@@ -15,18 +15,10 @@ import compareJson from './compare-json';
 import { getCtx, getCtxItem, pushCtxItem, setCtx, setCtxItem } from './context';
 import setupEntities from './entities';
 import { defineElasticSteps } from './entities/elasticsearch';
-import {
-  triggerAfterInitialContext,
-  triggerAfterTeardown,
-  triggerBeforeInitialContext,
-  triggerBeforeTeardown,
-} from './hooks';
 import setupHttp from './http';
 import setupMisc from './misc';
 import { getOpSpec } from './operators';
 import printOperators, { printError } from './operators/printer';
-import { setupOutputCapture } from './output';
-import setupRequireMock from './require';
 import stepCtor from './steps/constructor';
 import printSteps from './steps/printer';
 import { Step, StepKind } from './steps/types';
@@ -52,34 +44,22 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
   // Tear down
   const {
     aliases = {},
-    captureOutput,
     elasticSearchIndexUri,
     entities = {},
     http,
     operators = {},
-    requireMocks,
-    suppressOutput,
     timeout,
     usage,
   } = options;
 
-  if (captureOutput || suppressOutput) {
-    setupOutputCapture(captureOutput, suppressOutput);
-  }
-
   const getTearDown = () => getCtxItem<TearDownFn[]>('$tearDown');
   if (!process.env.KEEP_DATA) {
     After(async () => {
-      triggerBeforeTeardown();
-      try {
-        await Promise.all(
-          getTearDown()
-            .reverse()
-            .map((fn) => fn()),
-        );
-      } finally {
-        triggerAfterTeardown();
-      }
+      await Promise.all(
+        getTearDown()
+          .reverse()
+          .map((fn) => fn()),
+      );
     });
   }
 
@@ -87,7 +67,6 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
 
   Before(($scenario) => {
     // Execute before initial context hook
-    triggerBeforeInitialContext();
     const customCtx =
       (options.initialContext && options.initialContext()) || {};
     setCtx({
@@ -97,7 +76,6 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
       $tearDown: [],
     });
     // Execute after initial context hook
-    triggerAfterInitialContext();
   });
 
   const entityNames = Object.keys(entities);
@@ -125,8 +103,8 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
     AfterAll,
     AfterStep,
     Before,
-    BeforeAll,
     BeforeStep,
+    BeforeAll,
     compare: (op, a, e) => {
       const error = compareJson(operators, op, a, e);
       if (error !== undefined) printError(error);
@@ -141,7 +119,6 @@ const setup = (fn: SetupFn, options: Options = {}): Step[] => {
   };
 
   setupMisc(args);
-  if (requireMocks) setupRequireMock(requireMocks);
   if (hasEntities) setupEntities(entities, args);
   if (elasticSearchIndexUri) defineElasticSteps(elasticSearchIndexUri, args);
   if (http) setupHttp(http, args);

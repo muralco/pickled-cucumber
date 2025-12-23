@@ -80,7 +80,6 @@ const options: Options = {
     '/api/*': /\/api\/.*/,
     'proper-name': /[A-Z][a-z]*/,
   },
-  captureOutput: true,
   elasticSearchIndexUri: ELASTIC_URI,
   entities,
   http: httpFetch(nodeFetch),
@@ -92,22 +91,10 @@ const options: Options = {
     },
     initialFive: 5,
   }),
-  requireMocks: {
-    'totally-random-module': 42,
-  },
-  suppressOutput: true,
   usage: true,
 };
 
 const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
-  // === Test `requireMocks` ================================================ //
-  assert.equal(
-    // eslint-disable-next-line
-    require('totally-random-module'),
-    42,
-    'Require mocks are not working',
-  );
-
   // === Test `compareJson` and `aliases` =================================== //
   const getResult = () => getCtx<CompareError>('$result');
 
@@ -196,10 +183,6 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
   Given('feature file is', (payload) =>
     setCtx(`feature-file-content`, payload),
   );
-  Given('stdio output is suppressed', () =>
-    setCtx(`suppression-enabled`, true),
-  );
-  Given('stdio output is captured', () => setCtx(`capture-enabled`, true));
   When('the suite is executed', async () => {
     const testDir = await mkdtemp(`output-test-`);
     const featureFile = path.join(testDir, 'test-feature.feature');
@@ -207,12 +190,9 @@ const fn: SetupFn = ({ getCtx, Given, onTearDown, setCtx, Then, When }) => {
 
     await writeFile(featureFile, getCtx('feature-file-content'));
 
-    const testOptions: Options = {
-      captureOutput: getCtx<boolean | undefined>('capture-enabled'),
-      suppressOutput: getCtx<boolean | undefined>('suppression-enabled'),
-    };
+    const testOptions: Options = {};
 
-    // Asume they define fn
+    // Assume they define fn
     const stepsContent = `
 import setup, { SetupFn } from '../src/index';
 
@@ -230,61 +210,29 @@ setup(fn, {
 
     await writeFile(stepsFile, stepsContent);
 
-    try {
-      const output = await execa(
-        './node_modules/.bin/cucumber-js',
-        [
-          '--publish-quiet',
-          '--require-module',
-          'ts-node/register',
-          '-r',
-          stepsFile,
-          featureFile,
-        ],
-        {
-          env: {
-            TS_NODE_CACHE: 'false',
-            TS_NODE_FILES: 'true',
-          },
+    await execa(
+      './node_modules/.bin/cucumber-js',
+      [
+        '--publish-quiet',
+        '--require-module',
+        'ts-node/register',
+        '-r',
+        stepsFile,
+        featureFile,
+      ],
+      {
+        env: {
+          TS_NODE_CACHE: 'false',
+          TS_NODE_FILES: 'true',
         },
-      );
-      setCtx('test-suite-stdout', output.stdout);
-      setCtx('test-suite-stderr', output.stderr);
-    } catch (error) {
-      // Test suite can fail
-      setCtx('test-suite-stdout', error.stdout);
-      setCtx('test-suite-stderr', error.stderr);
-    }
+      },
+    );
 
     onTearDown(async () => {
       if (testDir) {
         await rmdir(testDir, { recursive: true });
       }
     });
-  });
-  Then('stdout contains', (payload) => {
-    const output = getCtx<string>('test-suite-stdout');
-    // Remove last line (used to report status because has timings
-    const filtered = output
-      .split('\n')
-      .map((line) => line.split(' #')[0])
-      .filter((line) => {
-        // Remove last line (used to report status because has timings)
-        if (line.includes('s (executing steps: ')) {
-          return false;
-        }
-        // Remove information from exceptions
-        if (line.startsWith('           at ')) {
-          return false;
-        }
-        return true;
-      })
-      .join('\n');
-    assert.deepEqual(payload, filtered);
-  });
-  Then('stderr contains', (payload) => {
-    const output = getCtx<string>('test-suite-stderr');
-    assert.deepEqual(payload, output);
   });
 };
 

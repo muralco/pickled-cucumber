@@ -44,3 +44,9 @@ export type SetupFnArgs = Pick<
   Then: StepDefinitionFn;
   When: StepDefinitionFn;
 };
+
+export interface PartialFindResult {
+  actual?: unknown;
+  matched: boolean;
+  path: string;
+}

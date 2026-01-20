@@ -1,3 +1,5 @@
+import { PartialFindResult } from './types';
+
 export const getString = (actual: unknown): string =>
   typeof actual === 'string'
     ? actual
@@ -5,8 +7,10 @@ export const getString = (actual: unknown): string =>
     ? JSON.stringify('')
     : JSON.stringify(actual);
 
-// Checks `a` and `b` and returns `undefined` if they match (i.e. they are
-// deep equal) or the path where they differ.
+/**
+ * Checks `a` and `b` and returns `undefined` if they match (i.e. they are
+ * deep equal) or the path where they differ.
+ */
 export function recursiveMatch(
   a: unknown,
   b: unknown,
@@ -63,6 +67,23 @@ export function recursiveMatch(
     .find((path) => path !== undefined);
 }
 
+/**
+ * Recursivelly checks if `actual` has an `expectedPartial` at `path`
+ * @param actual Actual item being compared
+ */
+const recursivePartialMatch = (
+  actual: unknown,
+  expectedPartial: unknown,
+  path?: string,
+) => {
+  const expected =
+    isObject(actual) && isObject(expectedPartial)
+      ? { ...actual, ...expectedPartial } // make a whole object from a partial
+      : expectedPartial; // is a primitive or array
+
+  return recursiveMatch(actual, expected, path, true);
+};
+
 const IDX_REGEX = /(.*)\[(\d+)\]$/;
 
 // eslint-disable-next-line
@@ -73,6 +94,9 @@ const getProp = (o: any, prop: string): any | undefined => {
 
 const getPathSegments = (path: string) =>
   (path.match(/"[^"]*"|[^.]+/g) || []).map((k) => k.replace(/^"(.*)"$/, '$1'));
+
+const isObject = (item: unknown): item is Record<string, unknown> =>
+  typeof item === 'object' && !Array.isArray(item) && item !== null;
 
 export const getDeep = (o: unknown, path: string): unknown | undefined =>
   path === undefined
@@ -91,4 +115,47 @@ export const stringToRegexp = (str: string): RegExp => {
     .replace(/^"(.*)"$/, '$1');
 
   return new RegExp(expectedString, flags);
+};
+
+export const NOT_IN_ARRAY = Symbol('NOT_IN_ARRAY');
+
+/**
+ * Find a partial inside an array using recursivePartialMatch.
+ * The returned path is the index in which it was found, or in the
+ * case of failing, the path where it differs.
+ */
+export const findPartialInCollection = (
+  actual: unknown,
+  expected: string,
+): PartialFindResult => {
+  // Actual is not an array, test partial `expected` match against `actual`
+  if (!Array.isArray(actual)) {
+    const path = recursivePartialMatch(actual, expected);
+    const matched = path === undefined;
+    return { actual, path: path || '', matched };
+  }
+
+  // Actual it an array, test partial for each item
+  const items = actual.map((a, i) => {
+    const path = recursivePartialMatch(a, expected, `${i}`);
+    const matched = path === undefined;
+    return {
+      actual: a,
+      path: path || `${i}`,
+      matched,
+    };
+  });
+
+  // Return the first matched item
+  const matchedItem = items.find(({ matched }) => matched);
+  if (matchedItem) {
+    return { actual, path: `${matchedItem.path}`, matched: true };
+  }
+
+  // Otherwise, the match fails
+  return {
+    actual: NOT_IN_ARRAY,
+    path: items.length ? items[0].path : '0',
+    matched: false,
+  };
 };
